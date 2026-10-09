@@ -3,6 +3,25 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import { getDatabase } from 'firebase/database';
+import {
+  createUserWithEmailAndPassword as fbCreateUser,
+  signInWithEmailAndPassword as fbSignIn,
+  signOut as fbSignOut,
+  onAuthStateChanged
+} from 'firebase/auth';
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit
+} from 'firebase/firestore';
 
 // Importar mocks para desarrollo local
 import * as mockAuth from './mockAuth';
@@ -84,6 +103,34 @@ if (isUsingMockAuth) {
   rtDatabase = getDatabase(app);
   console.log('✅ [WAREHOUSE APP] Firebase inicializado correctamente');
 }
+
+// Crear objeto de módulo para Firebase real (exporta funciones firebase)
+const firebaseAuthModule = {
+  createUserWithEmailAndPassword: fbCreateUser,
+  signInWithEmailAndPassword: fbSignIn,
+  signOut: fbSignOut,
+  onAuthStateChanged,
+  getMockUserRole: (uid) => Promise.reject(new Error('Firebase not configured')),
+  setMockUserData: (uid, data) => Promise.reject(new Error('Firebase not configured'))
+};
+
+const firebaseFirestoreModule = {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  orderBy,
+  limit
+};
+
+// Exportar módulos según modo
+export const authModule = isUsingMockAuth ? mockAuth : firebaseAuthModule;
+export const firestoreModule = isUsingMockAuth ? mockFirestore : firebaseFirestoreModule;
 
 export const auth_obj = auth;
 export const db_obj = db;

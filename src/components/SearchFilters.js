@@ -12,7 +12,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
   const [showFilters, setShowFilters] = useState(false);
 
   // Aplicar búsqueda y filtros
-  const applyFilters = () => {
+  const applyFilters = React.useCallback(() => {
     const filtered = inventory.filter(item => {
       const matchSearch = 
         item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -27,12 +27,12 @@ const SearchFilters = ({ inventory, onFilter }) => {
     });
 
     onFilter(filtered);
-  };
+  }, [searchTerm, filters, inventory, onFilter]);
 
   // Aplicar filtros cuando cambian
   React.useEffect(() => {
     applyFilters();
-  }, [searchTerm, filters]);
+  }, [applyFilters]);
 
   const resetFilters = () => {
     setSearchTerm('');

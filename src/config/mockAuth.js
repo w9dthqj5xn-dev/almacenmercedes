@@ -208,7 +208,7 @@ export const setMockUserData = async (uid, data) => {
   });
 };
 
-export default {
+const mockAuthModule = {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
@@ -216,3 +216,5 @@ export default {
   getMockUserRole,
   setMockUserData
 };
+
+export default mockAuthModule;

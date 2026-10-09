@@ -188,7 +188,7 @@ export const limit = (count) => {
   return { count };
 };
 
-export default {
+const mockFirestoreModule = {
   getDoc,
   setDoc,
   updateDoc,
@@ -201,3 +201,5 @@ export default {
   orderBy,
   limit
 };
+
+export default mockFirestoreModule;

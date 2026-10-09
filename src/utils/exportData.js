@@ -6,7 +6,6 @@ export const exportToPDF = (inventory, filename = 'inventario') => {
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
 
     // Título
     doc.setFontSize(18);

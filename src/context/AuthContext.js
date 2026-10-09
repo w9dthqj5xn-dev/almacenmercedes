@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import { 
   createUserWithEmailAndPassword as fbCreateUser, 
   signInWithEmailAndPassword as fbSignIn, 
@@ -34,7 +34,8 @@ export const AuthProvider = ({ children }) => {
   const docFn = isLocalMode ? firestoreModule.doc : doc;
 
   // Obtener datos del usuario
-  const getUserRole = async (uid) => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const getUserRole = useCallback(async (uid) => {
     try {
       if (isLocalMode) {
         const role = await authModule.getMockUserRole(uid);
@@ -48,7 +49,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Error obteniendo rol:', err);
     }
     return null;
-  };
+  }, [getDocFn, docFn]);
 
   // Monitorear cambios de autenticación
   useEffect(() => {
@@ -73,7 +74,7 @@ export const AuthProvider = ({ children }) => {
       console.log('[AuthContext] Cleaning up onAuthStateChanged listener');
       unsubscribe();
     };
-  }, []);
+  }, [onAuthChange, getUserRole]);
 
   // Registrar nuevo usuario
   const register = async (email, password, role) => {

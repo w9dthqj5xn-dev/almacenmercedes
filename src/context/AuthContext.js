@@ -81,10 +81,12 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, email, password);
       
+      const userRole = role || 'dispatch';
+      
       // Guardar datos del usuario en Realtime Database
       if (isLocalMode) {
         await authModule.setMockUserData(newUser.uid, {
-          role: role || 'dispatch'
+          role: userRole
         });
       } else {
         // Usar Realtime Database en lugar de Firestore
@@ -92,7 +94,7 @@ export const AuthProvider = ({ children }) => {
           const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);
           await dbSet(userRef, {
             email: newUser.email,
-            role: role || 'dispatch',
+            role: userRole,
             createdAt: new Date().toISOString(),
             active: true
           });
@@ -102,7 +104,8 @@ export const AuthProvider = ({ children }) => {
         }
       }
 
-      return newUser;
+      // Retornar usuario y rol para que el componente pueda usarlo
+      return { user: newUser, role: userRole };
     } catch (err) {
       setError(err.message);
       throw err;

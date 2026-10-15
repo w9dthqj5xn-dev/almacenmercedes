@@ -55,17 +55,35 @@ const Login = () => {
         return;
       }
 
-      await register(email, password, registerRole);
+      const { role } = await register(email, password, registerRole);
       setError('✅ Cuenta creada exitosamente! Iniciando sesión...');
       
-      // Auto login después de registrar
-      setTimeout(() => {
-        handleLogin(e);
-      }, 1000);
+      // Auto login después de registrar con un pequeño delay
+      setTimeout(async () => {
+        try {
+          setLoading(true);
+          console.log('[Login] Attempting auto-login after registration');
+          await login(email, password);
+          console.log('[Login] Auto-login successful, redirecting...');
+          
+          // Redirigir según el rol
+          if (role === 'admin') {
+            navigate('/admin/dashboard');
+          } else if (role === 'dispatch') {
+            navigate('/dispatch/home');
+          } else {
+            setError(`❌ Rol desconocido: ${role}`);
+          }
+        } catch (loginErr) {
+          console.error('[Login] Auto-login error:', loginErr);
+          const errorMsg = loginErr.message || 'Error al iniciar sesión automáticamente';
+          setError(`❌ ${errorMsg}`);
+          setLoading(false);
+        }
+      }, 500);
     } catch (err) {
       const errorMsg = err.message || 'Error al registrarse';
       setError(`❌ ${errorMsg}`);
-    } finally {
       setLoading(false);
     }
   };

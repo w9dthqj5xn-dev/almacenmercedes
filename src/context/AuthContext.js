@@ -5,8 +5,8 @@ import {
   signOut as fbSignOut, 
   onAuthStateChanged 
 } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { auth_obj, db_obj, isLocalMode, authModule, firestoreModule } from '../config/firebase';
+import { ref as dbRef, get, set as dbSet } from 'firebase/database';
+import { auth_obj, rtDatabase_obj, isLocalMode, authModule } from '../config/firebase';
 
 const AuthContext = createContext();
 
@@ -29,9 +29,6 @@ export const AuthProvider = ({ children }) => {
   const signInWithEmailAndPassword = isLocalMode ? authModule.signInWithEmailAndPassword : fbSignIn;
   const signOut = isLocalMode ? authModule.signOut : fbSignOut;
   const onAuthChange = isLocalMode ? authModule.onAuthStateChanged : onAuthStateChanged;
-  const getDocFn = isLocalMode ? firestoreModule.getDoc : getDoc;
-  const setDocFn = isLocalMode ? firestoreModule.setDoc : setDoc;
-  const docFn = isLocalMode ? firestoreModule.doc : doc;
 
   // Obtener datos del usuario
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -41,15 +38,17 @@ export const AuthProvider = ({ children }) => {
         const role = await authModule.getMockUserRole(uid);
         return role;
       }
-      const userDoc = await getDocFn(docFn(db_obj, 'users', uid));
-      if (userDoc.exists()) {
-        return userDoc.data().role;
+      // Usar Realtime Database en lugar de Firestore
+      const userRef = dbRef(rtDatabase_obj, `users/${uid}`);
+      const snapshot = await get(userRef);
+      if (snapshot.exists()) {
+        return snapshot.val().role;
       }
     } catch (err) {
       console.error('Error obteniendo rol:', err);
     }
     return null;
-  }, [getDocFn, docFn]);
+  }, []);
 
   // Monitorear cambios de autenticación
   useEffect(() => {
@@ -82,18 +81,25 @@ export const AuthProvider = ({ children }) => {
       setError(null);
       const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, email, password);
       
-      // Guardar datos del usuario
+      // Guardar datos del usuario en Realtime Database
       if (isLocalMode) {
         await authModule.setMockUserData(newUser.uid, {
           role: role || 'dispatch'
         });
       } else {
-        await setDocFn(docFn(db_obj, 'users', newUser.uid), {
-          email: newUser.email,
-          role: role || 'dispatch',
-          createdAt: new Date(),
-          active: true
-        });
+        // Usar Realtime Database en lugar de Firestore
+        try {
+          const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);
+          await dbSet(userRef, {
+            email: newUser.email,
+            role: role || 'dispatch',
+            createdAt: new Date().toISOString(),
+            active: true
+          });
+        } catch (dbErr) {
+          console.error('[Register] Error guardando en Database:', dbErr);
+          // No fallar si hay error guardando - el usuario fue creado exitosamente
+        }
       }
 
       return newUser;

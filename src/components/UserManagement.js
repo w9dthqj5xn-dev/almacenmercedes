@@ -12,6 +12,7 @@ const UserManagement = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [adminCredentials, setAdminCredentials] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -73,6 +74,28 @@ const UserManagement = () => {
       return;
     }
 
+    // Si estamos en modo Firebase, pedir credenciales del admin
+    if (!isLocalMode && !adminCredentials) {
+      const adminEmail = prompt('Para crear un usuario, ingresa tu email de admin:');
+      if (!adminEmail) {
+        setMessage('❌ Operación cancelada');
+        return;
+      }
+      
+      const adminPassword = prompt('Ingresa tu contraseña de admin:');
+      if (!adminPassword) {
+        setMessage('❌ Operación cancelada');
+        return;
+      }
+      
+      setAdminCredentials({ email: adminEmail, password: adminPassword });
+      // Volver a ejecutar handleSubmit con las credenciales
+      setTimeout(() => {
+        e.target.dispatchEvent(new Event('submit', { bubbles: true }));
+      }, 0);
+      return;
+    }
+
     try {
       setLoading(true);
       setMessage('');
@@ -108,12 +131,14 @@ const UserManagement = () => {
         // Modo Firebase: crear usuario con Firebase Auth
         try {
           const { auth_obj } = await import('../config/firebase');
-          const { createUserWithEmailAndPassword } = await import('firebase/auth');
+          const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = await import('firebase/auth');
           
-          // Crear el nuevo usuario (esto hace que Firebase Auth lo loguee automáticamente)
+          console.log('[UserManagement] Creating new user...');
+          // Paso 1: Crear el nuevo usuario (esto cambia el usuario autenticado)
           const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, formData.email, formData.password);
+          console.log('[UserManagement] New user created:', newUser.uid);
           
-          // Guardar datos en Realtime Database INMEDIATAMENTE
+          // Paso 2: Guardar datos en Realtime Database INMEDIATAMENTE
           const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);
           await set(userRef, {
             email: formData.email,
@@ -121,17 +146,33 @@ const UserManagement = () => {
             createdAt: new Date().toISOString(),
             active: true
           });
+          console.log('[UserManagement] User data saved to database');
 
-          // El usuario admin se habrá "cambiado" internamente en Firebase Auth
-          // pero el onAuthStateChanged debería mantenerlo en el contexto
-          // porque estamos en la misma sesión
+          // Paso 3: Re-autenticar al admin usando las credenciales guardadas
+          if (adminCredentials) {
+            console.log('[UserManagement] Re-authenticating admin...');
+            try {
+              await signInWithEmailAndPassword(auth_obj, adminCredentials.email, adminCredentials.password);
+              console.log('[UserManagement] Admin re-authenticated successfully');
+            } catch (reAuthError) {
+              console.error('[UserManagement] Error re-authenticating admin:', reAuthError);
+              setMessage('⚠️ Usuario creado, pero hubo un error re-autenticando al admin. Por favor inicia sesión nuevamente.');
+              setAdminCredentials(null);
+              setLoading(false);
+              return;
+            }
+          }
           
-          // Simplemente recargar usuarios y mostrar mensaje de éxito
+          // Paso 4: Esperar a que onAuthStateChanged se actualice
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
+          // Paso 5: Recargar usuarios
           await loadUsers();
 
           setMessage('✅ Usuario creado exitosamente');
           setFormData({ email: '', password: '', role: 'dispatch' });
           setShowForm(false);
+          setAdminCredentials(null);
         } catch (authError) {
           if (authError.code === 'auth/email-already-in-use') {
             setMessage('❌ El email ya está registrado');
@@ -140,11 +181,13 @@ const UserManagement = () => {
           } else {
             setMessage(`❌ Error: ${authError.message}`);
           }
+          setAdminCredentials(null);
         }
       }
     } catch (error) {
       console.error('Error creando usuario:', error);
       setMessage('❌ Error al crear usuario');
+      setAdminCredentials(null);
     } finally {
       setLoading(false);
     }

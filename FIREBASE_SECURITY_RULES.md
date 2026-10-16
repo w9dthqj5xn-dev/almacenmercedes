@@ -8,6 +8,8 @@ Ir a: Firebase Console → Realtime Database → Reglas
 {
   "rules": {
     "users": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
       "$uid": {
         ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin'",
         ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin'",

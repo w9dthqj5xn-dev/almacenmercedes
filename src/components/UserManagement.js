@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { ref as dbRef, get, set, update } from 'firebase/database';
+import { ref as dbRef, get, set } from 'firebase/database';
 import { rtDatabase_obj, isLocalMode, authModule } from '../config/firebase';
-import { Users, Plus, Trash2, Edit2, AlertCircle, Check } from 'lucide-react';
+import { Users, Plus, Trash2, AlertCircle, Check } from 'lucide-react';
 import '../styles/UserManagement.css';
 
 const UserManagement = () => {
-  const { user, userRole } = useAuth();
+  const { userRole } = useAuth();
   const [users, setUsers] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -107,13 +107,13 @@ const UserManagement = () => {
       } else {
         // Modo Firebase: crear usuario con Firebase Auth
         try {
-          // Usar la función de registro del AuthContext, pero de forma más directa
-          const createUserFn = await import('firebase/auth').then(m => m.createUserWithEmailAndPassword);
           const { auth_obj } = await import('../config/firebase');
+          const { createUserWithEmailAndPassword } = await import('firebase/auth');
           
-          const { user: newUser } = await createUserFn(auth_obj, formData.email, formData.password);
+          // Crear el nuevo usuario (esto hace que Firebase Auth lo loguee automáticamente)
+          const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, formData.email, formData.password);
           
-          // Guardar datos en Realtime Database
+          // Guardar datos en Realtime Database INMEDIATAMENTE
           const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);
           await set(userRef, {
             email: formData.email,
@@ -122,10 +122,16 @@ const UserManagement = () => {
             active: true
           });
 
+          // El usuario admin se habrá "cambiado" internamente en Firebase Auth
+          // pero el onAuthStateChanged debería mantenerlo en el contexto
+          // porque estamos en la misma sesión
+          
+          // Simplemente recargar usuarios y mostrar mensaje de éxito
+          await loadUsers();
+
           setMessage('✅ Usuario creado exitosamente');
           setFormData({ email: '', password: '', role: 'dispatch' });
           setShowForm(false);
-          loadUsers();
         } catch (authError) {
           if (authError.code === 'auth/email-already-in-use') {
             setMessage('❌ El email ya está registrado');

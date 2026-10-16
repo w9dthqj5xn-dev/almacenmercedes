@@ -1,0 +1,31 @@
+{
+  "rules": {
+    "users": {
+      ".read": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$uid": {
+        ".read": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin'",
+        ".write": "$uid === auth.uid || root.child('users').child(auth.uid).child('role').val() === 'admin'",
+        ".validate": "newData.hasChildren(['role', 'email'])"
+      }
+    },
+    "products": {
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
+      "$productId": {
+        ".validate": "newData.hasChildren(['name', 'quantity'])"
+      }
+    },
+    "shipments": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$shipmentId": {
+        ".validate": "newData.hasChildren(['status', 'createdBy'])"
+      }
+    },
+    "statistics": {
+      ".read": "auth != null",
+      ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'"
+    }
+  }
+}

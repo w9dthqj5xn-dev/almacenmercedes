@@ -12,7 +12,6 @@ const UserManagement = () => {
   const [editingId, setEditingId] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [adminCredentials, setAdminCredentials] = useState(null);
   const [showAdminAuthModal, setShowAdminAuthModal] = useState(false);
   const [adminAuthForm, setAdminAuthForm] = useState({
     email: '',
@@ -81,14 +80,14 @@ const UserManagement = () => {
     }
 
     // Si estamos en modo Firebase, pedir credenciales del admin
-    if (!isLocalMode && !adminCredentials) {
+    if (!isLocalMode) {
       setPendingUserData(formData);
       setShowAdminAuthModal(true);
       return;
     }
 
-    // Crear el usuario
-    await createUser(formData, adminCredentials);
+    // Modo local: crear el usuario directamente
+    await createUser(formData, null);
   };
 
   const handleAdminAuthSubmit = async (e) => {
@@ -99,14 +98,9 @@ const UserManagement = () => {
       return;
     }
 
-    setAdminCredentials(adminAuthForm);
-    setShowAdminAuthModal(false);
-    
-    // Crear el usuario con las credenciales guardadas
+    // Crear el usuario con las credenciales del admin
     if (pendingUserData) {
       await createUser(pendingUserData, adminAuthForm);
-      setPendingUserData(null);
-      setAdminAuthForm({ email: '', password: '' });
     }
   };
 
@@ -148,61 +142,83 @@ const UserManagement = () => {
           const { auth_obj } = await import('../config/firebase');
           const { createUserWithEmailAndPassword, signInWithEmailAndPassword } = await import('firebase/auth');
           
-          console.log('[UserManagement] Creating new user...');
-          // Paso 1: Crear el nuevo usuario (esto cambia el usuario autenticado)
-          const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, userData.email, userData.password);
-          console.log('[UserManagement] New user created:', newUser.uid);
+          console.log('[UserManagement] Creating new user with email:', userData.email);
+          
+          // Paso 1: Crear el nuevo usuario (esto cambia el usuario autenticado a newUser)
+          let newUser;
+          try {
+            const result = await createUserWithEmailAndPassword(auth_obj, userData.email, userData.password);
+            newUser = result.user;
+            console.log('[UserManagement] New user created successfully:', newUser.uid);
+          } catch (createError) {
+            console.error('[UserManagement] Error creating user:', createError.code, createError.message);
+            if (createError.code === 'auth/email-already-in-use') {
+              setMessage('❌ El email ya está registrado');
+            } else if (createError.code === 'auth/weak-password') {
+              setMessage('❌ La contraseña es muy débil');
+            } else {
+              setMessage(`❌ Error al crear usuario: ${createError.message}`);
+            }
+            throw createError;
+          }
           
           // Paso 2: Guardar datos en Realtime Database INMEDIATAMENTE
-          const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);
-          await set(userRef, {
-            email: userData.email,
-            role: userData.role,
-            createdAt: new Date().toISOString(),
-            active: true
-          });
-          console.log('[UserManagement] User data saved to database');
+          try {
+            const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);
+            await set(userRef, {
+              email: userData.email,
+              role: userData.role,
+              createdAt: new Date().toISOString(),
+              active: true
+            });
+            console.log('[UserManagement] User data saved to database successfully');
+          } catch (dbError) {
+            console.error('[UserManagement] Error saving user data:', dbError);
+            setMessage(`❌ Error al guardar datos del usuario: ${dbError.message}`);
+            throw dbError;
+          }
 
           // Paso 3: Re-autenticar al admin usando las credenciales guardadas
           if (adminCreds) {
-            console.log('[UserManagement] Re-authenticating admin...');
+            console.log('[UserManagement] Attempting to re-authenticate admin with email:', adminCreds.email);
             try {
               await signInWithEmailAndPassword(auth_obj, adminCreds.email, adminCreds.password);
               console.log('[UserManagement] Admin re-authenticated successfully');
             } catch (reAuthError) {
-              console.error('[UserManagement] Error re-authenticating admin:', reAuthError);
-              setMessage('⚠️ Usuario creado, pero hubo un error re-autenticando al admin. Por favor inicia sesión nuevamente.');
-              setAdminCredentials(null);
-              setLoading(false);
-              return;
+              console.error('[UserManagement] Error re-authenticating admin:', reAuthError.code, reAuthError.message);
+              // El usuario fue creado exitosamente, pero el admin no pudo re-autenticarse
+              // Mostrar mensaje de alerta pero no fallar completamente
+              setMessage('⚠️ Usuario creado exitosamente, pero hubo un error re-autenticando. Por favor inicia sesión nuevamente.');
             }
+          } else {
+            console.warn('[UserManagement] No admin credentials provided for re-authentication');
           }
           
           // Paso 4: Esperar a que onAuthStateChanged se actualice
           await new Promise(resolve => setTimeout(resolve, 500));
           
           // Paso 5: Recargar usuarios
+          console.log('[UserManagement] Reloading users list');
           await loadUsers();
 
+          console.log('[UserManagement] User creation completed successfully');
           setMessage('✅ Usuario creado exitosamente');
           setFormData({ email: '', password: '', role: 'dispatch' });
           setShowForm(false);
-          setAdminCredentials(null);
+          setShowAdminAuthModal(false);
+          setAdminAuthForm({ email: '', password: '' });
+          setPendingUserData(null);
+          
         } catch (authError) {
-          if (authError.code === 'auth/email-already-in-use') {
-            setMessage('❌ El email ya está registrado');
-          } else if (authError.code === 'auth/weak-password') {
-            setMessage('❌ La contraseña es muy débil');
-          } else {
-            setMessage(`❌ Error: ${authError.message}`);
-          }
-          setAdminCredentials(null);
+          // El error ya fue manejado en los bloques try-catch internos
+          console.error('[UserManagement] Final catch block - error already handled above');
+        } finally {
+          setShowAdminAuthModal(false);
         }
       }
     } catch (error) {
       console.error('Error creando usuario:', error);
-      setMessage('❌ Error al crear usuario');
-      setAdminCredentials(null);
+      setMessage(`❌ Error al crear usuario: ${error.message}`);
     } finally {
       setLoading(false);
     }

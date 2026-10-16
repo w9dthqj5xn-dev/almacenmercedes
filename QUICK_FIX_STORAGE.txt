@@ -1,0 +1,85 @@
+╔════════════════════════════════════════════════════════════════════════════╗
+║                                                                            ║
+║                     🚀 QUICK FIX: IMÁGENES (5 minutos)                    ║
+║                                                                            ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+
+EL PROBLEMA
+───────────
+Productos sin foto → Guarda ✅
+Productos con foto → Se queda pensando ❌
+
+
+LA SOLUCIÓN
+───────────
+Firebase Storage no está habilitado. Esto toma 5 minutos:
+
+
+PASO 1 (3 minutos)
+──────────────────
+Abre en navegador:
+https://console.firebase.google.com/project/almacenmercedes-461d2/storage
+
+Haz click en "Get Started" (botón azul)
+
+Elige:
+- Location: europe-west1
+- Mode: Desarrollador
+
+Haz click "Create" y espera a que termine
+
+
+PASO 2 (1 minuto)
+─────────────────
+Abre Terminal y ejecuta:
+
+cd /Users/ing.carlosjimenez/almacen
+firebase deploy --only storage
+
+Espera a ver: ✔ storage: rules released successfully
+
+
+PASO 3 (1 minuto)
+─────────────────
+Vuelve al navegador:
+
+1. Recarga página (Cmd+R)
+2. Intenta guardar producto CON imagen
+3. ¡Debería funcionar! ✅
+
+
+¿QUÉ PASÓ?
+──────────
+✅ Storage ahora está habilitado
+✅ Código mejorado para manejar errores
+✅ Imágenes se suben a Firebase Storage
+✅ Productos se guardan con imágenes
+
+
+DURANTE EL PROCESO, VAS A VER EN CONSOLA (F12):
+────────────────────────────────────────────────
+📤 Subiendo imagen: archivo.jpg
+✅ Imagen subida exitosamente
+✅ URL obtenida: https://storage...
+💾 Guardando producto
+✅ Nuevo producto creado en Firebase
+✅ ¡Producto guardado exitosamente!
+
+
+¿ALGO SALE MAL?
+───────────────
+- Abre consola (F12)
+- Intenta de nuevo
+- Copia error rojo
+- Avísame
+
+
+ARCHIVOS CREADOS/MODIFICADOS:
+──────────────────────────────
+✅ storage.rules (CREADO)
+✅ firebase.json (ACTUALIZADO)
+✅ AdminDashboard.js (MEJORADO)
+
+
+LISTO. ¡Ahora habilita Storage en Firebase Console! 🎉

@@ -169,6 +169,21 @@ const UserManagement = () => {
             throw createError;
           }
           
+          // Paso 1.5: En modo LOCAL (mockAuth), también guardar en localStorage
+          if (isLocalMode) {
+            const mockUsers = JSON.parse(localStorage.getItem('mock_users') || '{}');
+            mockUsers[userData.email] = {
+              uid: newUser.uid,
+              email: userData.email,
+              password: userData.password,
+              role: userData.role,
+              createdAt: new Date().toISOString(),
+              active: true
+            };
+            localStorage.setItem('mock_users', JSON.stringify(mockUsers));
+            console.log('[UserManagement] User also saved to localStorage for mockAuth');
+          }
+          
           // Paso 2: Guardar datos en Realtime Database INMEDIATAMENTE
           try {
             const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { db_obj, storage_obj, firestoreModule, isLocalMode } from '../config/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { Plus, Trash2, Edit2, Image as ImageIcon, Download } from 'lucide-react';
+import { Plus, Trash2, Edit2, Image as ImageIcon, Download, Users } from 'lucide-react';
 import Header from '../components/Header';
 import PhotoGallery from '../components/PhotoGallery';
 import SearchFilters from '../components/SearchFilters';
+import UserManagement from '../components/UserManagement';
 import { exportToPDF, exportToCSV } from '../utils/exportData';
 import '../styles/Admin.css';
 
@@ -23,6 +24,7 @@ const generateSKU = (existingCount) => {
 };
 
 const AdminDashboard = () => {
+  const [activeTab, setActiveTab] = useState('inventory');
   const [inventory, setInventory] = useState([]);
   const [filteredInventory, setFilteredInventory] = useState([]);
   const [showForm, setShowForm] = useState(false);

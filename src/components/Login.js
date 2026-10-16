@@ -92,9 +92,9 @@ const Login = () => {
     <div className="login-container">
       <div className="login-card">
         <div className="login-header">
-          <LogIn size={40} />
-          <h1>Warehouse Management</h1>
-          <p>Sistema de Gestión de Almacén</p>
+          <img src="/mercedes-logo.jpeg" alt="Mercedes Group Logo" className="login-logo" />
+          <h1>Mercedes Group</h1>
+          <p>Gestión de Almacén</p>
         </div>
 
         <form onSubmit={isRegisterMode ? handleRegister : handleLogin} className="login-form">

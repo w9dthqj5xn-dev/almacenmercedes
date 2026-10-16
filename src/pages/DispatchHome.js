@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { ref as dbRef, get, set as dbSet, update as dbUpdate } from 'firebase/database';
 import { rtDatabase_obj } from '../config/firebase';
+import Header from '../components/Header';
 import '../styles/Dispatch.css';
 
 const DispatchHome = () => {
@@ -158,14 +159,7 @@ const DispatchHome = () => {
 
   return (
     <div className="dispatch-container">
-      {/* Header */}
-      <header className="dispatch-header">
-        <h1>📦 Panel de Despacho</h1>
-        <div className="user-info">
-          <span>{user?.email}</span>
-          <span className="role-badge">📦 Despacho</span>
-        </div>
-      </header>
+      <Header />
 
       {/* Mensajes */}
       {dispatchError && <div className="alert error">{dispatchError}</div>}

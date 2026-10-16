@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { db_obj, storage_obj, firestoreModule, isLocalMode } from '../config/firebase';
+import { storage_obj, isLocalMode, rtDatabase_obj } from '../config/firebase';
+import { ref as dbRef, get, set, update, remove } from 'firebase/database';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Plus, Trash2, Edit2, Image as ImageIcon, Download, Users } from 'lucide-react';
 import Header from '../components/Header';
@@ -8,14 +9,6 @@ import SearchFilters from '../components/SearchFilters';
 import UserManagement from '../components/UserManagement';
 import { exportToPDF, exportToCSV } from '../utils/exportData';
 import '../styles/Admin.css';
-
-// Usar funciones según modo local o real
-const collection = firestoreModule.collection;
-const query = firestoreModule.query;
-const getDocs = firestoreModule.getDocs;
-const updateDoc = firestoreModule.updateDoc;
-const doc = firestoreModule.doc;
-const deleteDoc = firestoreModule.deleteDoc;
 
 // Generar SKU automático basado en cantidad de productos existentes
 const generateSKU = (existingCount) => {
@@ -54,13 +47,29 @@ const AdminDashboard = () => {
 
   const loadInventory = async () => {
     try {
-      const q = query(collection(db_obj, 'inventory'));
-      const snapshot = await getDocs(q);
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-      setInventory(data);
+      if (isLocalMode) {
+        // Modo local: cargar del localStorage
+        const mockInventory = JSON.parse(localStorage.getItem('mock_inventory') || '{}');
+        const data = Object.entries(mockInventory).map(([id, item]) => ({
+          id,
+          ...item
+        }));
+        setInventory(data);
+      } else {
+        // Modo Firebase: cargar del Realtime Database
+        const productsRef = dbRef(rtDatabase_obj, 'products');
+        const snapshot = await get(productsRef);
+        if (snapshot.exists()) {
+          const productsData = snapshot.val();
+          const data = Object.entries(productsData).map(([id, item]) => ({
+            id,
+            ...item
+          }));
+          setInventory(data);
+        } else {
+          setInventory([]);
+        }
+      }
     } catch (error) {
       console.error('Error cargando inventario:', error);
     }
@@ -145,7 +154,7 @@ const AdminDashboard = () => {
       } else if (storage_obj) {
         // En modo real, subir a Firebase Storage
         for (const photo of formData.photos) {
-          const storageRef = ref(storage_obj, `inventory/${Date.now()}_${photo.name}`);
+          const storageRef = ref(storage_obj, `products/${Date.now()}_${photo.name}`);
           await uploadBytes(storageRef, photo);
           const url = await getDownloadURL(storageRef);
           photoUrls.push(url);
@@ -158,18 +167,30 @@ const AdminDashboard = () => {
         quantity: parseInt(formData.quantity),
         sku: formData.sku,
         photos: photoUrls,
-        lastUpdated: new Date(),
+        lastUpdated: new Date().toISOString(),
         dispatched: 0,
-        created: editingId ? new Date(inventory.find(i => i.id === editingId)?.created) : new Date()
+        created: editingId ? inventory.find(i => i.id === editingId)?.created : new Date().toISOString()
       };
 
-      if (editingId) {
-        await updateDoc(doc(db_obj, 'inventory', editingId), data);
-      } else {
-        // En modo mock, usar setDoc en lugar de addDoc
-        if (isLocalMode) {
+      if (isLocalMode) {
+        // Modo local: guardar en localStorage
+        const mockInventory = JSON.parse(localStorage.getItem('mock_inventory') || '{}');
+        if (editingId) {
+          mockInventory[editingId] = { ...mockInventory[editingId], ...data };
+        } else {
           const newId = `product-${Date.now()}`;
-          await firestoreModule.setDoc(doc(db_obj, 'inventory', newId), data);
+          mockInventory[newId] = data;
+        }
+        localStorage.setItem('mock_inventory', JSON.stringify(mockInventory));
+      } else {
+        // Modo Firebase: guardar en Realtime Database
+        if (editingId) {
+          const productRef = dbRef(rtDatabase_obj, `products/${editingId}`);
+          await update(productRef, data);
+        } else {
+          // Crear nuevo producto con ID generado
+          const newProductRef = dbRef(rtDatabase_obj, `products/${`product-${Date.now()}`}`);
+          await set(newProductRef, data);
         }
       }
 
@@ -201,7 +222,16 @@ const AdminDashboard = () => {
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar este producto?')) {
       try {
-        await deleteDoc(doc(db_obj, 'inventory', id));
+        if (isLocalMode) {
+          // Modo local: eliminar del localStorage
+          const mockInventory = JSON.parse(localStorage.getItem('mock_inventory') || '{}');
+          delete mockInventory[id];
+          localStorage.setItem('mock_inventory', JSON.stringify(mockInventory));
+        } else {
+          // Modo Firebase: eliminar del Realtime Database
+          const productRef = dbRef(rtDatabase_obj, `products/${id}`);
+          await remove(productRef);
+        }
         loadInventory();
       } catch (error) {
         console.error('Error eliminando producto:', error);

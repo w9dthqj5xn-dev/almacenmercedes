@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { storage_obj, isLocalMode, rtDatabase_obj } from '../config/firebase';
 import { ref as dbRef, get, set, update, remove } from 'firebase/database';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { Plus, Trash2, Edit2, Image as ImageIcon, Download, Users } from 'lucide-react';
 import Header from '../components/Header';
 import PhotoGallery from '../components/PhotoGallery';
 import SearchFilters from '../components/SearchFilters';
 import UserManagement from '../components/UserManagement';
 import { exportToPDF, exportToCSV } from '../utils/exportData';
+import { uploadImage } from '../utils/imageStorage';
 import '../styles/Admin.css';
 
 // Generar SKU automático basado en cantidad de productos existentes
@@ -145,62 +145,103 @@ const AdminDashboard = () => {
     try {
       setLoading(true);
 
-      // Subir fotos a Storage (solo en modo real)
+      // Validar campos requeridos
+      if (!formData.name || !formData.quantity) {
+        alert('Por favor completa nombre y cantidad');
+        setLoading(false);
+        return;
+      }
+
+      // Generar ID para el producto
+      const productId = editingId || `product-${Date.now()}`;
+
+      // Subir fotos
       const photoUrls = [];
       
       if (isLocalMode) {
         // En modo local, usar las data URLs de preview
         photoUrls.push(...photoPreview);
-      } else if (storage_obj) {
-        // En modo real, subir a Firebase Storage
-        for (const photo of formData.photos) {
-          const storageRef = ref(storage_obj, `products/${Date.now()}_${photo.name}`);
-          await uploadBytes(storageRef, photo);
-          const url = await getDownloadURL(storageRef);
-          photoUrls.push(url);
+        console.log('✅ Modo LOCAL: usando data URLs para imágenes');
+      } else if (formData.photos.length > 0) {
+        // En modo real, subir a Firebase Storage o Base de Datos
+        console.log(`📤 Iniciando subida de ${formData.photos.length} imagen(es)`);
+        
+        for (let i = 0; i < formData.photos.length; i++) {
+          const photo = formData.photos[i];
+          try {
+            // Usar la utilidad que intenta Storage primero, luego Database como fallback
+            const result = await uploadImage(storage_obj, rtDatabase_obj, photo, productId);
+            photoUrls.push(result.url);
+            console.log(`✅ Imagen ${i + 1}/${formData.photos.length} guardada (${result.method})`);
+          } catch (photoError) {
+            console.error(`❌ Error en imagen ${i + 1}:`, photoError.message);
+            alert(`Error subiendo imagen ${photo.name}: ${photoError.message}`);
+            setLoading(false);
+            return;
+          }
         }
       }
 
       const data = {
-        name: formData.name,
-        description: formData.description,
+        name: formData.name.trim(),
+        description: formData.description.trim(),
         quantity: parseInt(formData.quantity),
-        sku: formData.sku,
+        sku: formData.sku.trim() || `SKU-${Date.now()}`,
         photos: photoUrls,
         lastUpdated: new Date().toISOString(),
         dispatched: 0,
         created: editingId ? inventory.find(i => i.id === editingId)?.created : new Date().toISOString()
       };
 
+      console.log('💾 Guardando producto:', data);
+
       if (isLocalMode) {
         // Modo local: guardar en localStorage
         const mockInventory = JSON.parse(localStorage.getItem('mock_inventory') || '{}');
         if (editingId) {
           mockInventory[editingId] = { ...mockInventory[editingId], ...data };
+          console.log('✅ Producto actualizado en localStorage');
         } else {
-          const newId = `product-${Date.now()}`;
-          mockInventory[newId] = data;
+          mockInventory[productId] = data;
+          console.log('✅ Nuevo producto guardado en localStorage:', productId);
         }
         localStorage.setItem('mock_inventory', JSON.stringify(mockInventory));
       } else {
         // Modo Firebase: guardar en Realtime Database
-        if (editingId) {
-          const productRef = dbRef(rtDatabase_obj, `products/${editingId}`);
-          await update(productRef, data);
-        } else {
-          // Crear nuevo producto con ID generado
-          const newProductRef = dbRef(rtDatabase_obj, `products/${`product-${Date.now()}`}`);
-          await set(newProductRef, data);
+        try {
+          if (editingId) {
+            const productRef = dbRef(rtDatabase_obj, `products/${editingId}`);
+            await update(productRef, data);
+            console.log('✅ Producto actualizado en Firebase');
+          } else {
+            const newProductRef = dbRef(rtDatabase_obj, `products/${productId}`);
+            await set(newProductRef, data);
+            console.log('✅ Nuevo producto creado en Firebase:', productId);
+          }
+        } catch (dbError) {
+          console.error('❌ Error en operación de BD:', dbError);
+          alert(`Error guardando en base de datos: ${dbError.message}`);
+          setLoading(false);
+          return;
         }
       }
 
+      // Limpiar formulario
       setFormData({ name: '', description: '', quantity: '', sku: '', photos: [] });
       setPhotoPreview([]);
       setEditingId(null);
       setShowForm(false);
-      loadInventory();
+      
+      // Recargar inventario
+      await loadInventory();
+      
+      // Mostrar confirmación
+      const imagineCount = photoUrls.length;
+      const imagineMsg = imagineCount > 0 ? ` con ${imagineCount} imagen${imagineCount > 1 ? 'es' : ''}` : '';
+      alert(`✅ ¡Producto guardado exitosamente!${imagineMsg}`);
     } catch (error) {
-      console.error('Error guardando producto:', error);
+      console.error('❌ Error general guardando producto:', error);
+      alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
     }

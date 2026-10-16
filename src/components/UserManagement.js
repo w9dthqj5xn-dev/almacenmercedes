@@ -13,6 +13,12 @@ const UserManagement = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [adminCredentials, setAdminCredentials] = useState(null);
+  const [showAdminAuthModal, setShowAdminAuthModal] = useState(false);
+  const [adminAuthForm, setAdminAuthForm] = useState({
+    email: '',
+    password: ''
+  });
+  const [pendingUserData, setPendingUserData] = useState(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -76,26 +82,35 @@ const UserManagement = () => {
 
     // Si estamos en modo Firebase, pedir credenciales del admin
     if (!isLocalMode && !adminCredentials) {
-      const adminEmail = prompt('Para crear un usuario, ingresa tu email de admin:');
-      if (!adminEmail) {
-        setMessage('❌ Operación cancelada');
-        return;
-      }
-      
-      const adminPassword = prompt('Ingresa tu contraseña de admin:');
-      if (!adminPassword) {
-        setMessage('❌ Operación cancelada');
-        return;
-      }
-      
-      setAdminCredentials({ email: adminEmail, password: adminPassword });
-      // Volver a ejecutar handleSubmit con las credenciales
-      setTimeout(() => {
-        e.target.dispatchEvent(new Event('submit', { bubbles: true }));
-      }, 0);
+      setPendingUserData(formData);
+      setShowAdminAuthModal(true);
       return;
     }
 
+    // Crear el usuario
+    await createUser(formData, adminCredentials);
+  };
+
+  const handleAdminAuthSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!adminAuthForm.email || !adminAuthForm.password) {
+      setMessage('❌ Email y contraseña del admin son requeridos');
+      return;
+    }
+
+    setAdminCredentials(adminAuthForm);
+    setShowAdminAuthModal(false);
+    
+    // Crear el usuario con las credenciales guardadas
+    if (pendingUserData) {
+      await createUser(pendingUserData, adminAuthForm);
+      setPendingUserData(null);
+      setAdminAuthForm({ email: '', password: '' });
+    }
+  };
+
+  const createUser = async (userData, adminCreds) => {
     try {
       setLoading(true);
       setMessage('');
@@ -105,23 +120,23 @@ const UserManagement = () => {
         const mockUsers = JSON.parse(localStorage.getItem('mock_users') || '{}');
         const uid = `user-${Date.now()}`;
         
-        if (mockUsers[formData.email]) {
+        if (mockUsers[userData.email]) {
           setMessage('❌ El email ya está registrado');
           setLoading(false);
           return;
         }
 
-        mockUsers[formData.email] = {
+        mockUsers[userData.email] = {
           uid,
-          email: formData.email,
-          password: formData.password,
-          role: formData.role,
+          email: userData.email,
+          password: userData.password,
+          role: userData.role,
           createdAt: new Date().toISOString(),
           active: true
         };
 
         localStorage.setItem('mock_users', JSON.stringify(mockUsers));
-        await authModule.setMockUserData(uid, { role: formData.role });
+        await authModule.setMockUserData(uid, { role: userData.role });
         
         setMessage('✅ Usuario creado exitosamente');
         setFormData({ email: '', password: '', role: 'dispatch' });
@@ -135,24 +150,24 @@ const UserManagement = () => {
           
           console.log('[UserManagement] Creating new user...');
           // Paso 1: Crear el nuevo usuario (esto cambia el usuario autenticado)
-          const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, formData.email, formData.password);
+          const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, userData.email, userData.password);
           console.log('[UserManagement] New user created:', newUser.uid);
           
           // Paso 2: Guardar datos en Realtime Database INMEDIATAMENTE
           const userRef = dbRef(rtDatabase_obj, `users/${newUser.uid}`);
           await set(userRef, {
-            email: formData.email,
-            role: formData.role,
+            email: userData.email,
+            role: userData.role,
             createdAt: new Date().toISOString(),
             active: true
           });
           console.log('[UserManagement] User data saved to database');
 
           // Paso 3: Re-autenticar al admin usando las credenciales guardadas
-          if (adminCredentials) {
+          if (adminCreds) {
             console.log('[UserManagement] Re-authenticating admin...');
             try {
-              await signInWithEmailAndPassword(auth_obj, adminCredentials.email, adminCredentials.password);
+              await signInWithEmailAndPassword(auth_obj, adminCreds.email, adminCreds.password);
               console.log('[UserManagement] Admin re-authenticated successfully');
             } catch (reAuthError) {
               console.error('[UserManagement] Error re-authenticating admin:', reAuthError);
@@ -389,6 +404,86 @@ const UserManagement = () => {
           </table>
         )}
       </div>
+
+      {showAdminAuthModal && (
+        <div className="modal-overlay">
+          <div className="modal-content admin-auth-modal">
+            <div className="modal-header">
+              <h3>Verificación de Administrador</h3>
+              <button 
+                className="modal-close"
+                onClick={() => {
+                  setShowAdminAuthModal(false);
+                  setPendingUserData(null);
+                  setAdminAuthForm({ email: '', password: '' });
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="modal-body">
+              <p>Para crear un nuevo usuario, necesitamos verificar tu identidad como administrador.</p>
+              
+              <form onSubmit={handleAdminAuthSubmit} className="admin-auth-form">
+                <div className="form-group">
+                  <label htmlFor="admin-email">Tu Email de Admin</label>
+                  <input
+                    id="admin-email"
+                    type="email"
+                    value={adminAuthForm.email}
+                    onChange={(e) => setAdminAuthForm({
+                      ...adminAuthForm,
+                      email: e.target.value
+                    })}
+                    placeholder="admin@example.com"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="admin-password">Tu Contraseña de Admin</label>
+                  <input
+                    id="admin-password"
+                    type="password"
+                    value={adminAuthForm.password}
+                    onChange={(e) => setAdminAuthForm({
+                      ...adminAuthForm,
+                      password: e.target.value
+                    })}
+                    placeholder="••••••"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+
+                <div className="modal-actions">
+                  <button 
+                    type="submit" 
+                    className="btn-success"
+                    disabled={loading}
+                  >
+                    {loading ? 'Verificando...' : 'Verificar y Crear'}
+                  </button>
+                  <button 
+                    type="button" 
+                    className="btn-secondary"
+                    onClick={() => {
+                      setShowAdminAuthModal(false);
+                      setPendingUserData(null);
+                      setAdminAuthForm({ email: '', password: '' });
+                    }}
+                    disabled={loading}
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

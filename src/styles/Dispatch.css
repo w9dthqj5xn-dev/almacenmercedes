@@ -192,15 +192,26 @@
   border-top: 1px solid #e9ecef;
 }
 
-.quantity-input {
+.text-input,
+.quantity-input,
+.cost-input {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
+  font-family: inherit;
 }
 
-.quantity-input:focus {
+.text-input::placeholder,
+.quantity-input::placeholder,
+.cost-input::placeholder {
+  color: #999;
+}
+
+.text-input:focus,
+.quantity-input:focus,
+.cost-input:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);

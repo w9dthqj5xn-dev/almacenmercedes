@@ -687,6 +687,17 @@
   text-align: center;
 }
 
+.recipient-cell {
+  font-weight: 500;
+  color: #2e7d32;
+}
+
+.cost-cell {
+  font-weight: 700;
+  color: #d97706;
+  text-align: right;
+}
+
 .user-cell {
   font-weight: 500;
   color: #333;

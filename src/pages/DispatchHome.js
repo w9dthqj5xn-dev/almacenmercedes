@@ -11,6 +11,8 @@ const DispatchHome = () => {
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [dispatchQuantity, setDispatchQuantity] = useState(1);
+  const [recipientName, setRecipientName] = useState('');
+  const [dispatchCost, setDispatchCost] = useState('');
   const [dispatchError, setDispatchError] = useState('');
   const [dispatchSuccess, setDispatchSuccess] = useState('');
 
@@ -78,6 +80,18 @@ const DispatchHome = () => {
       return;
     }
 
+    if (!recipientName.trim()) {
+      setDispatchError('❌ Ingresa el nombre de la empresa o persona');
+      setTimeout(() => setDispatchError(''), 3000);
+      return;
+    }
+
+    if (!dispatchCost || parseFloat(dispatchCost) < 0) {
+      setDispatchError('❌ Ingresa un costo válido');
+      setTimeout(() => setDispatchError(''), 3000);
+      return;
+    }
+
     if (dispatchQuantity > product.quantity) {
       setDispatchError(`❌ No hay suficiente stock. Disponible: ${product.quantity}`);
       setTimeout(() => setDispatchError(''), 3000);
@@ -95,9 +109,12 @@ const DispatchHome = () => {
         productName: product.name,
         productSku: product.sku,
         quantity: parseInt(dispatchQuantity),
+        cost: parseFloat(dispatchCost),
+        recipientName: recipientName.trim(),
         userEmail: user.email,
         createdAt: new Date().toISOString(),
-        date: new Date().toLocaleDateString('es-ES')
+        date: new Date().toLocaleDateString('es-ES'),
+        time: new Date().toLocaleTimeString('es-ES')
       };
 
       // Guardar el despacho
@@ -112,9 +129,11 @@ const DispatchHome = () => {
         dispatched: (product.dispatched || 0) + parseInt(dispatchQuantity)
       });
 
-      setDispatchSuccess(`✅ Despacho registrado: ${dispatchQuantity} ${product.name} despachados`);
+      setDispatchSuccess(`✅ Despacho registrado: ${dispatchQuantity} ${product.name} para ${recipientName}`);
       setSelectedProduct(null);
       setDispatchQuantity(1);
+      setRecipientName('');
+      setDispatchCost('');
       setTimeout(() => setDispatchSuccess(''), 3000);
 
       // Recargar datos
@@ -187,6 +206,13 @@ const DispatchHome = () => {
                   {selectedProduct?.id === product.id ? (
                     <div className="dispatch-form">
                       <input
+                        type="text"
+                        value={recipientName}
+                        onChange={(e) => setRecipientName(e.target.value)}
+                        placeholder="Nombre de empresa o persona"
+                        className="text-input"
+                      />
+                      <input
                         type="number"
                         min="1"
                         max={product.quantity}
@@ -194,6 +220,15 @@ const DispatchHome = () => {
                         onChange={(e) => setDispatchQuantity(e.target.value)}
                         placeholder="Cantidad"
                         className="quantity-input"
+                      />
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={dispatchCost}
+                        onChange={(e) => setDispatchCost(e.target.value)}
+                        placeholder="Costo ($)"
+                        className="cost-input"
                       />
                       <div className="button-group">
                         <button
@@ -205,7 +240,12 @@ const DispatchHome = () => {
                         </button>
                         <button
                           className="btn btn-secondary"
-                          onClick={() => setSelectedProduct(null)}
+                          onClick={() => {
+                            setSelectedProduct(null);
+                            setRecipientName('');
+                            setDispatchQuantity(1);
+                            setDispatchCost('');
+                          }}
                           disabled={loading}
                         >
                           Cancelar

@@ -170,6 +170,8 @@ const DispatchedEquipment = () => {
                 <th>Fecha</th>
                 <th>Producto (SKU)</th>
                 <th>Cantidad</th>
+                <th>Destinatario</th>
+                <th>Costo</th>
                 <th>Usuario</th>
                 <th>Hora</th>
               </tr>
@@ -190,6 +192,8 @@ const DispatchedEquipment = () => {
                       <small className="sku">{dispatch.productSku}</small>
                     </td>
                     <td className="quantity-cell">{dispatch.quantity}</td>
+                    <td className="recipient-cell">{dispatch.recipientName || 'N/A'}</td>
+                    <td className="cost-cell">${dispatch.cost ? dispatch.cost.toFixed(2) : '0.00'}</td>
                     <td className="user-cell">{dispatch.userEmail}</td>
                     <td className="time-cell">{time}</td>
                   </tr>

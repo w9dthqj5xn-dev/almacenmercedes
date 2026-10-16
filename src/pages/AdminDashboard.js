@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { storage_obj, isLocalMode, rtDatabase_obj } from '../config/firebase';
+import { isLocalMode, rtDatabase_obj } from '../config/firebase';
 import { ref as dbRef, get, set, update, remove } from 'firebase/database';
-import { Plus, Trash2, Edit2, Image as ImageIcon, Download, Users } from 'lucide-react';
+import { Plus, Trash2, Edit2, Download, Users } from 'lucide-react';
 import Header from '../components/Header';
-import PhotoGallery from '../components/PhotoGallery';
 import SearchFilters from '../components/SearchFilters';
 import UserManagement from '../components/UserManagement';
 import { exportToPDF, exportToCSV } from '../utils/exportData';
-import { uploadImage } from '../utils/imageStorage';
 import '../styles/Admin.css';
 
 // Generar SKU automático basado en cantidad de productos existentes
@@ -22,18 +20,13 @@ const AdminDashboard = () => {
   const [filteredInventory, setFilteredInventory] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [galleryOpen, setGalleryOpen] = useState(false);
-  const [selectedProductPhotos, setSelectedProductPhotos] = useState([]);
-  const [selectedProductName, setSelectedProductName] = useState('');
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     quantity: '',
-    sku: '',
-    photos: []
+    sku: ''
   });
   const [loading, setLoading] = useState(false);
-  const [photoPreview, setPhotoPreview] = useState([]);
 
   // Cargar inventario
   useEffect(() => {
@@ -75,70 +68,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Comprimir imagen para ahorrar espacio en localStorage
-  const compressImage = (file) => {
-    return new Promise((resolve) => {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const ctx = canvas.getContext('2d');
-          
-          // Limitar tamaño máximo a 800px (mantener calidad pero reducir tamaño)
-          const maxSize = 800;
-          let width = img.width;
-          let height = img.height;
-          
-          if (width > height) {
-            if (width > maxSize) {
-              height = (height * maxSize) / width;
-              width = maxSize;
-            }
-          } else {
-            if (height > maxSize) {
-              width = (width * maxSize) / height;
-              height = maxSize;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          // Comprimir a JPEG con calidad 70%
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.7);
-          resolve(compressedDataUrl);
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-  };
-
-  const handlePhotoChange = (e) => {
-    const files = Array.from(e.target.files || []);
-    if (files.length === 0) return;
-    
-    // Comprimir todas las fotos
-    const compressedPreviews = files.map(file => compressImage(file));
-
-    Promise.all(compressedPreviews).then(previews => {
-      setPhotoPreview(prev => [...prev, ...previews]);
-      setFormData(prev => ({
-        ...prev,
-        photos: [...prev.photos, ...files]
-      }));
-    });
-  };
-
-  const removePhoto = (index) => {
-    setPhotoPreview(prev => prev.filter((_, i) => i !== index));
-    setFormData(prev => ({
-      ...prev,
-      photos: prev.photos.filter((_, i) => i !== index)
-    }));
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,39 +84,11 @@ const AdminDashboard = () => {
       // Generar ID para el producto
       const productId = editingId || `product-${Date.now()}`;
 
-      // Subir fotos
-      const photoUrls = [];
-      
-      if (isLocalMode) {
-        // En modo local, usar las data URLs de preview
-        photoUrls.push(...photoPreview);
-        console.log('✅ Modo LOCAL: usando data URLs para imágenes');
-      } else if (formData.photos.length > 0) {
-        // En modo real, subir a Firebase Storage o Base de Datos
-        console.log(`📤 Iniciando subida de ${formData.photos.length} imagen(es)`);
-        
-        for (let i = 0; i < formData.photos.length; i++) {
-          const photo = formData.photos[i];
-          try {
-            // Usar la utilidad que intenta Storage primero, luego Database como fallback
-            const result = await uploadImage(storage_obj, rtDatabase_obj, photo, productId);
-            photoUrls.push(result.url);
-            console.log(`✅ Imagen ${i + 1}/${formData.photos.length} guardada (${result.method})`);
-          } catch (photoError) {
-            console.error(`❌ Error en imagen ${i + 1}:`, photoError.message);
-            alert(`Error subiendo imagen ${photo.name}: ${photoError.message}`);
-            setLoading(false);
-            return;
-          }
-        }
-      }
-
       const data = {
         name: formData.name.trim(),
         description: formData.description.trim(),
         quantity: parseInt(formData.quantity),
         sku: formData.sku.trim() || `SKU-${Date.now()}`,
-        photos: photoUrls,
         lastUpdated: new Date().toISOString(),
         dispatched: 0,
         created: editingId ? inventory.find(i => i.id === editingId)?.created : new Date().toISOString()
@@ -227,8 +128,7 @@ const AdminDashboard = () => {
       }
 
       // Limpiar formulario
-      setFormData({ name: '', description: '', quantity: '', sku: '', photos: [] });
-      setPhotoPreview([]);
+      setFormData({ name: '', description: '', quantity: '', sku: '' });
       setEditingId(null);
       setShowForm(false);
       
@@ -236,9 +136,7 @@ const AdminDashboard = () => {
       await loadInventory();
       
       // Mostrar confirmación
-      const imagineCount = photoUrls.length;
-      const imagineMsg = imagineCount > 0 ? ` con ${imagineCount} imagen${imagineCount > 1 ? 'es' : ''}` : '';
-      alert(`✅ ¡Producto guardado exitosamente!${imagineMsg}`);
+      alert(`✅ ¡Producto guardado exitosamente!`);
     } catch (error) {
       console.error('❌ Error general guardando producto:', error);
       alert(`Error: ${error.message}`);
@@ -252,10 +150,8 @@ const AdminDashboard = () => {
       name: item.name,
       description: item.description,
       quantity: item.quantity,
-      sku: item.sku,
-      photos: []
+      sku: item.sku
     });
-    setPhotoPreview(item.photos || []);
     setEditingId(item.id);
     setShowForm(true);
   };
@@ -319,14 +215,12 @@ const AdminDashboard = () => {
                       name: '', 
                       description: '', 
                       quantity: '', 
-                      sku: newSku, 
-                      photos: [] 
+                      sku: newSku
                     });
                   } else {
                     setEditingId(null);
-                    setFormData({ name: '', description: '', quantity: '', sku: '', photos: [] });
+                    setFormData({ name: '', description: '', quantity: '', sku: '' });
                   }
-                  setPhotoPreview([]);
                 }}
               >
                 <Plus size={20} />
@@ -384,48 +278,6 @@ const AdminDashboard = () => {
                 />
               </div>
 
-              <div className="form-group full">
-                <span>Fotos del Producto (múltiples) - Opcional</span>
-                <div className="photo-upload-wrapper">
-                  <label className="photo-upload" htmlFor="photo-input">
-                    <input
-                      id="photo-input"
-                      type="file"
-                      multiple
-                      accept="image/*"
-                      onChange={handlePhotoChange}
-                      style={{ display: 'none' }}
-                    />
-                    <div className="upload-area">
-                      <ImageIcon size={32} />
-                      <span>Haz click para seleccionar fotos</span>
-                      <small>o arrastra archivos aquí</small>
-                    </div>
-                  </label>
-                </div>
-              </div>
-
-              {photoPreview.length > 0 && (
-                <div className="photo-preview">
-                  <h4>Fotos Seleccionadas ({photoPreview.length}):</h4>
-                  <div className="preview-grid">
-                    {photoPreview.map((preview, index) => (
-                      <div key={index} className="preview-item">
-                        <img src={preview} alt={`Preview ${index}`} />
-                        <button
-                          type="button"
-                          onClick={() => removePhoto(index)}
-                          className="remove-btn"
-                          title="Eliminar esta foto"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
               <div className="form-actions">
                 <button type="submit" className="btn-primary" disabled={loading}>
                   {loading ? 'Guardando...' : 'Guardar Producto'}
@@ -436,8 +288,7 @@ const AdminDashboard = () => {
                   onClick={() => {
                     setShowForm(false);
                     setEditingId(null);
-                    setFormData({ name: '', description: '', quantity: '', sku: '', photos: [] });
-                    setPhotoPreview([]);
+                    setFormData({ name: '', description: '', quantity: '', sku: '' });
                   }}
                 >
                   Cancelar
@@ -480,26 +331,6 @@ const AdminDashboard = () => {
             <div className="inventory-grid">
               {filteredInventory.map(item => (
                 <div key={item.id} className="product-card">
-                  <div className="product-image">
-                    {item.photos && item.photos.length > 0 ? (
-                      <div 
-                        className="image-wrapper clickable"
-                        onClick={() => {
-                          setSelectedProductPhotos(item.photos);
-                          setSelectedProductName(item.name);
-                          setGalleryOpen(true);
-                        }}
-                        title={item.photos.length > 1 ? 'Click para ver todas las fotos' : 'Foto del producto'}
-                      >
-                        <img src={item.photos[0]} alt={item.name} />
-                        {item.photos.length > 1 && (
-                          <div className="photo-badge">{item.photos.length}</div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="no-image">Sin foto</div>
-                    )}
-                  </div>
                   <div className="product-info">
                     <h4>{item.name}</h4>
                     <p className="sku">SKU: {item.sku}</p>
@@ -537,13 +368,6 @@ const AdminDashboard = () => {
             <UserManagement />
           </div>
         )}
-
-        <PhotoGallery
-          photos={selectedProductPhotos}
-          productName={selectedProductName}
-          isOpen={galleryOpen}
-          onClose={() => setGalleryOpen(false)}
-        />
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { isLocalMode, rtDatabase_obj } from '../config/firebase';
 import { ref as dbRef, get, set, update, remove } from 'firebase/database';
-import { Plus, Trash2, Edit2, Download, Users } from 'lucide-react';
+import { Plus, Trash2, Edit2, Download, Users, Truck } from 'lucide-react';
 import Header from '../components/Header';
 import SearchFilters from '../components/SearchFilters';
 import UserManagement from '../components/UserManagement';
+import DispatchedEquipment from '../components/DispatchedEquipment';
 import { exportToPDF, exportToCSV } from '../utils/exportData';
 import '../styles/Admin.css';
 
@@ -197,6 +198,13 @@ const AdminDashboard = () => {
               <Users size={18} />
               Usuarios
             </button>
+            <button
+              className={`tab-btn ${activeTab === 'dispatches' ? 'active' : ''}`}
+              onClick={() => setActiveTab('dispatches')}
+            >
+              <Truck size={18} />
+              Equipos Despachados
+            </button>
           </div>
         </div>
         <React.Fragment>
@@ -360,9 +368,13 @@ const AdminDashboard = () => {
           )}
         </div>
       </div>
-        ) : (
+        ) : activeTab === 'users' ? (
           <div className="tab-content">
             <UserManagement />
+          </div>
+        ) : (
+          <div className="tab-content">
+            <DispatchedEquipment />
           </div>
         )}
         </React.Fragment>

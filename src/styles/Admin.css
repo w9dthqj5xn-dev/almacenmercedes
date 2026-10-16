@@ -541,3 +541,204 @@
     transform: translateY(0);
   }
 }
+
+/* Dispatched Equipment Styles */
+.dispatched-equipment {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.equipment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #667eea;
+}
+
+.equipment-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 20px;
+}
+
+.equipment-stats {
+  display: flex;
+  gap: 20px;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.stat .label {
+  font-size: 12px;
+  color: #999;
+  font-weight: 500;
+}
+
+.stat .value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.equipment-filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.filter-select {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 13px;
+  background: white;
+  cursor: pointer;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.btn-reset {
+  background: #e9ecef;
+  color: #333;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 13px;
+  align-self: flex-end;
+  transition: background 0.3s;
+}
+
+.btn-reset:hover {
+  background: #dee2e6;
+}
+
+.equipment-table {
+  overflow-x: auto;
+}
+
+.equipment-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.equipment-table thead {
+  background: #f8f9fa;
+  border-bottom: 2px solid #667eea;
+}
+
+.equipment-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+}
+
+.equipment-table td {
+  padding: 12px;
+  border-bottom: 1px solid #e9ecef;
+  color: #666;
+}
+
+.equipment-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.id-cell {
+  font-family: 'Courier New', monospace;
+  font-size: 11px;
+  color: #999;
+  font-weight: 600;
+}
+
+.quantity-cell {
+  font-weight: 700;
+  color: #667eea;
+  text-align: center;
+}
+
+.user-cell {
+  font-weight: 500;
+  color: #333;
+}
+
+.time-cell {
+  color: #999;
+  font-size: 12px;
+}
+
+.sku {
+  color: #999;
+  font-size: 11px;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+@media (max-width: 768px) {
+  .equipment-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .equipment-stats {
+    width: 100%;
+    justify-content: space-around;
+  }
+
+  .equipment-filters {
+    flex-direction: column;
+  }
+
+  .filter-group {
+    min-width: 100%;
+  }
+
+  .btn-reset {
+    align-self: auto;
+    width: 100%;
+  }
+
+  .equipment-table {
+    font-size: 11px;
+  }
+
+  .equipment-table th,
+  .equipment-table td {
+    padding: 8px;
+  }
+}

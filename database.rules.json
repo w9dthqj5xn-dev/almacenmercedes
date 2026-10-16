@@ -13,7 +13,22 @@
       ".read": "auth != null",
       ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
       "$productId": {
+        ".read": true,
+        ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin'",
+        "quantity": {
+          ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'dispatch'"
+        },
+        "dispatched": {
+          ".write": "root.child('users').child(auth.uid).child('role').val() === 'admin' || root.child('users').child(auth.uid).child('role').val() === 'dispatch'"
+        },
         ".validate": "newData.hasChildren(['name', 'quantity'])"
+      }
+    },
+    "dispatches": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      "$dispatchId": {
+        ".validate": "newData.hasChildren(['productId', 'quantity', 'userEmail'])"
       }
     },
     "shipments": {

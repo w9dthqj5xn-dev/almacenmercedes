@@ -216,34 +216,54 @@ const AdminDashboard = () => {
       <div className="admin-container">
         <div className="admin-header">
           <h2>📊 Dashboard Administrativo</h2>
-          <button 
-            className="btn-primary"
-            onClick={() => {
-              const newShowForm = !showForm;
-              setShowForm(newShowForm);
-              if (newShowForm) {
-                // Al abrir el formulario, generar SKU automático
-                const newSku = generateSKU(inventory.length);
-                setFormData({ 
-                  name: '', 
-                  description: '', 
-                  quantity: '', 
-                  sku: newSku, 
-                  photos: [] 
-                });
-              } else {
-                setEditingId(null);
-                setFormData({ name: '', description: '', quantity: '', sku: '', photos: [] });
-              }
-              setPhotoPreview([]);
-            }}
-          >
-            <Plus size={20} />
-            Nuevo Producto
-          </button>
+          <div className="admin-tabs">
+            <button
+              className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
+              onClick={() => setActiveTab('inventory')}
+            >
+              📦 Inventario
+            </button>
+            <button
+              className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+              onClick={() => setActiveTab('users')}
+            >
+              <Users size={18} />
+              Usuarios
+            </button>
+          </div>
         </div>
 
-        {showForm && (
+        {activeTab === 'inventory' && (
+          <div className="tab-content">
+            <div style={{ marginBottom: '20px' }}>
+              <button 
+                className="btn-primary"
+                onClick={() => {
+                  const newShowForm = !showForm;
+                  setShowForm(newShowForm);
+                  if (newShowForm) {
+                    // Al abrir el formulario, generar SKU automático
+                    const newSku = generateSKU(inventory.length);
+                    setFormData({ 
+                      name: '', 
+                      description: '', 
+                      quantity: '', 
+                      sku: newSku, 
+                      photos: [] 
+                    });
+                  } else {
+                    setEditingId(null);
+                    setFormData({ name: '', description: '', quantity: '', sku: '', photos: [] });
+                  }
+                  setPhotoPreview([]);
+                }}
+              >
+                <Plus size={20} />
+                Nuevo Producto
+              </button>
+            </div>
+
+            {showForm && (
           <div className="form-section">
             <h3>{editingId ? 'Editar Producto' : 'Registrar Nuevo Producto'}</h3>
             <form onSubmit={handleSubmit} className="product-form">
@@ -437,6 +457,14 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
+        </div>
+        )}
+
+        {activeTab === 'users' && (
+          <div className="tab-content">
+            <UserManagement />
+          </div>
+        )}
 
         <PhotoGallery
           photos={selectedProductPhotos}

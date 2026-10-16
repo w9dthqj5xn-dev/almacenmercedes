@@ -199,8 +199,8 @@ const AdminDashboard = () => {
             </button>
           </div>
         </div>
-
-        {activeTab === 'inventory' && (
+        <React.Fragment>
+        {activeTab === 'inventory' ? (
           <div className="tab-content">
             <div style={{ marginBottom: '20px' }}>
               <button 
@@ -359,15 +359,13 @@ const AdminDashboard = () => {
             </div>
           )}
         </div>
-          )}
-        </div>
-        )}
-
-        {activeTab === 'users' && (
+      </div>
+        ) : (
           <div className="tab-content">
             <UserManagement />
           </div>
         )}
+        </React.Fragment>
       </div>
     </div>
   );

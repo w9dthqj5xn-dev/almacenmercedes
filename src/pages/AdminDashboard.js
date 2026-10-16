@@ -248,9 +248,9 @@ const AdminDashboard = () => {
                   <input
                     type="text"
                     value={formData.sku}
-                    onChange={(e) => setFormData({...formData, sku: e.target.value})}
+                    readOnly
                     placeholder="SKU-001"
-                    title="El SKU se genera automáticamente, pero puedes modificarlo"
+                    title="El SKU se genera automáticamente"
                     required
                   />
                 </div>

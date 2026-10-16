@@ -154,37 +154,7 @@ const Login = () => {
             {loading ? (isRegisterMode ? 'Registrando...' : 'Iniciando sesión...') : (isRegisterMode ? 'Crear Cuenta' : 'Iniciar Sesión')}
           </button>
 
-          <button
-            type="button"
-            className="toggle-mode-btn"
-            onClick={() => {
-              setIsRegisterMode(!isRegisterMode);
-              setError('');
-            }}
-            disabled={loading}
-          >
-            {isRegisterMode ? '¿Ya tienes cuenta? Inicia sesión' : '¿No tienes cuenta? Regístrate'}
-          </button>
         </form>
-
-        {!isRegisterMode && (
-          <div className="demo-credentials">
-            <p><strong>📌 Credenciales de Demostración:</strong></p>
-            <p>Admin: admin@test.com / password123</p>
-            <p>Despacho: dispatch@test.com / password123</p>
-            <p style={{ marginTop: '10px', fontSize: '12px', color: '#666' }}>
-              💡 Si las credenciales no existen, puedes crear una nueva cuenta arriba.
-            </p>
-          </div>
-        )}
-
-        {isRegisterMode && (
-          <div className="demo-credentials">
-            <p><strong>📝 Crear Nueva Cuenta:</strong></p>
-            <p>Ingresa un email y contraseña para registrarte</p>
-            <p>Selecciona el rol que deseas (Admin o Despacho)</p>
-          </div>
-        )}
       </div>
     </div>
   );

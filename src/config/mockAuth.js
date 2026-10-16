@@ -48,28 +48,34 @@ export const createUserWithEmailAndPassword = async (auth, email, password) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const users = getUsers();
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log('[mockAuth] createUserWithEmailAndPassword called with email:', email);
+      console.log('[mockAuth] Normalized email:', normalizedEmail);
 
-      if (users[email]) {
+      if (users[normalizedEmail]) {
+        console.error('[mockAuth] Email already in use:', normalizedEmail);
         reject(new Error('Firebase: Error (auth/email-already-in-use). The email address is already in use by another account.'));
         return;
       }
 
       if (password.length < 6) {
+        console.error('[mockAuth] Password too weak for email:', normalizedEmail);
         reject(new Error('Firebase: Error (auth/weak-password). Password should be at least 6 characters.'));
         return;
       }
 
       const newUser = {
         uid: `user-${Date.now()}`,
-        email: email,
+        email: normalizedEmail,
         password: password,
         role: 'dispatch', // Rol por defecto
         createdAt: new Date(),
         active: true
       };
 
-      users[email] = newUser;
+      users[normalizedEmail] = newUser;
       saveUsers(users);
+      console.log('[mockAuth] User created successfully. Email:', normalizedEmail, 'Stored users:', Object.keys(users));
 
       resolve({
         user: {
@@ -86,9 +92,14 @@ export const signInWithEmailAndPassword = async (auth, email, password) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       const users = getUsers();
-      const user = users[email];
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log('[mockAuth] signInWithEmailAndPassword called with email:', email);
+      console.log('[mockAuth] Normalized email:', normalizedEmail);
+      console.log('[mockAuth] Available users in localStorage:', Object.keys(users));
+      const user = users[normalizedEmail];
 
       if (!user) {
+        console.error('[mockAuth] User not found with email:', normalizedEmail);
         reject(new Error('Firebase: Error (auth/user-not-found). There is no user record corresponding to this identifier.'));
         return;
       }

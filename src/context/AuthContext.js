@@ -79,7 +79,9 @@ export const AuthProvider = ({ children }) => {
   const register = async (email, password, role) => {
     try {
       setError(null);
-      const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, email, password);
+      // Normalizar email: minúsculas y sin espacios
+      const normalizedEmail = email.toLowerCase().trim();
+      const { user: newUser } = await createUserWithEmailAndPassword(auth_obj, normalizedEmail, password);
       
       const userRole = role || 'dispatch';
       
@@ -117,8 +119,11 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log('[AuthContext] login() called with email:', email);
       setError(null);
+      // Normalizar email: minúsculas y sin espacios
+      const normalizedEmail = email.toLowerCase().trim();
+      console.log('[AuthContext] Normalized email:', normalizedEmail);
       console.log('[AuthContext] Calling signInWithEmailAndPassword...');
-      const { user: loginUser } = await signInWithEmailAndPassword(auth_obj, email, password);
+      const { user: loginUser } = await signInWithEmailAndPassword(auth_obj, normalizedEmail, password);
       console.log('[AuthContext] Sign in successful, user:', loginUser);
       const role = await getUserRole(loginUser.uid);
       console.log('[AuthContext] Role retrieved:', role);

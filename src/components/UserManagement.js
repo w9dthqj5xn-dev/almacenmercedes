@@ -79,15 +79,22 @@ const UserManagement = () => {
       return;
     }
 
+    // Normalizar email: minúsculas y sin espacios
+    const normalizedEmail = formData.email.toLowerCase().trim();
+    const normalizedFormData = {
+      ...formData,
+      email: normalizedEmail
+    };
+
     // Si estamos en modo Firebase, pedir credenciales del admin
     if (!isLocalMode) {
-      setPendingUserData(formData);
+      setPendingUserData(normalizedFormData);
       setShowAdminAuthModal(true);
       return;
     }
 
     // Modo local: crear el usuario directamente
-    await createUser(formData, null);
+    await createUser(normalizedFormData, null);
   };
 
   const handleAdminAuthSubmit = async (e) => {

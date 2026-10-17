@@ -46,10 +46,10 @@ let app, auth, db, storage, rtDatabase;
 
 if (isUsingMockAuth) {
   // Modo desarrollo: usar mocks locales
-  console.log('🔧 [WAREHOUSE APP] Usando autenticación LOCAL (mock)');
-  console.log('📝 [WAREHOUSE APP] Las credenciales de Firebase no están configuradas.');
-  console.log('📝 [WAREHOUSE APP] Para usar Firebase real, crea un proyecto en https://console.firebase.google.com');
-  console.log('📝 [WAREHOUSE APP] y actualiza las variables de entorno en .env.local');
+  console.log('🔧 [WAREHOUSE APP] Using LOCAL authentication (mock)');
+  console.log('📝 [WAREHOUSE APP] Firebase credentials are not configured.');
+  console.log('📝 [WAREHOUSE APP] To use real Firebase, create a project at https://console.firebase.google.com');
+  console.log('📝 [WAREHOUSE APP] and update the environment variables in .env.local');
   
   // Crear objetos dummy para compatibilidad
   app = { name: 'mock-app' };
@@ -80,7 +80,7 @@ if (isUsingMockAuth) {
         }
       };
       localStorage.setItem('mock_users', JSON.stringify(DEFAULT_USERS));
-      console.log('✅ [WAREHOUSE APP] Usuarios de prueba inicializados en localStorage');
+      console.log('✅ [WAREHOUSE APP] Test users initialized in localStorage');
     }
     
     if (!localStorage.getItem('mock_firestore')) {
@@ -89,19 +89,19 @@ if (isUsingMockAuth) {
         inventory: {},
         dispatch_history: {}
       }));
-      console.log('✅ [WAREHOUSE APP] Base de datos local inicializada');
+      console.log('✅ [WAREHOUSE APP] Local database initialized');
     }
   }
 } else {
   // Modo producción: usar Firebase real
-  console.log('🚀 [WAREHOUSE APP] Inicializando Firebase en producción...');
-  console.log(`📍 Proyecto: ${firebaseConfig.projectId}`);
+  console.log('🚀 [WAREHOUSE APP] Initializing Firebase in production...');
+  console.log(`📍 Project: ${firebaseConfig.projectId}`);
   app = initializeApp(firebaseConfig);
   auth = getAuth(app);
   db = getFirestore(app);
   storage = getStorage(app);
   rtDatabase = getDatabase(app);
-  console.log('✅ [WAREHOUSE APP] Firebase inicializado correctamente');
+  console.log('✅ [WAREHOUSE APP] Firebase initialized successfully');
 }
 
 // Crear objeto de módulo para Firebase real (exporta funciones firebase)

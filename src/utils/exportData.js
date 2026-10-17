@@ -2,18 +2,18 @@ import jsPDF from 'jspdf';
 import 'jspdf-autotable';
 import Papa from 'papaparse';
 
-export const exportToPDF = (inventory, filename = 'inventario') => {
+export const exportToPDF = (inventory, filename = 'inventory') => {
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
     // Título
     doc.setFontSize(18);
-    doc.text('📦 INVENTARIO DE ALMACÉN', pageWidth / 2, 15, { align: 'center' });
+    doc.text('📦 WAREHOUSE INVENTORY', pageWidth / 2, 15, { align: 'center' });
 
     // Fecha
     doc.setFontSize(10);
-    doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, 22, { align: 'center' });
+    doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`, pageWidth / 2, 22, { align: 'center' });
 
     // Tabla de datos
     const tableData = inventory.map(item => [
@@ -26,7 +26,7 @@ export const exportToPDF = (inventory, filename = 'inventario') => {
     ]);
 
     doc.autoTable({
-      head: [['Producto', 'SKU', 'Descripción', 'Stock', 'Despachado', 'Total']],
+      head: [['Product', 'SKU', 'Description', 'Stock', 'Dispatched', 'Total']],
       body: tableData,
       startY: 30,
       theme: 'grid',
@@ -55,30 +55,30 @@ export const exportToPDF = (inventory, filename = 'inventario') => {
 
     doc.setFontSize(10);
     doc.setFont(undefined, 'bold');
-    doc.text(`Total Productos: ${inventory.length}`, 14, finalY);
-    doc.text(`Stock Total: ${totalStock}`, 14, finalY + 6);
-    doc.text(`Total Despachado: ${totalDispatched}`, 14, finalY + 12);
+    doc.text(`Total Products: ${inventory.length}`, 14, finalY);
+    doc.text(`Total Stock: ${totalStock}`, 14, finalY + 6);
+    doc.text(`Total Dispatched: ${totalDispatched}`, 14, finalY + 12);
 
     // Guardar
     doc.save(`${filename}-${new Date().toISOString().split('T')[0]}.pdf`);
     return true;
   } catch (error) {
-    console.error('Error generando PDF:', error);
+    console.error('Error generating PDF:', error);
     return false;
   }
 };
 
-export const exportToCSV = (inventory, filename = 'inventario') => {
+export const exportToCSV = (inventory, filename = 'inventory') => {
   try {
     const data = inventory.map(item => ({
-      'Producto': item.name,
+      'Product': item.name,
       'SKU': item.sku,
-      'Descripción': item.description || '-',
+      'Description': item.description || '-',
       'Stock': item.quantity,
-      'Despachado': item.dispatched || 0,
+      'Dispatched': item.dispatched || 0,
       'Total': item.quantity + (item.dispatched || 0),
-      'Fecha Creación': item.created?.toDate?.()?.toLocaleDateString('es-ES') || '-',
-      'Última Actualización': item.lastUpdated?.toDate?.()?.toLocaleDateString('es-ES') || '-'
+      'Created Date': item.created?.toDate?.()?.toLocaleDateString('en-US') || '-',
+      'Last Updated': item.lastUpdated?.toDate?.()?.toLocaleDateString('en-US') || '-'
     }));
 
     const csv = Papa.unparse(data, {
@@ -102,23 +102,23 @@ export const exportToCSV = (inventory, filename = 'inventario') => {
     URL.revokeObjectURL(url);
     return true;
   } catch (error) {
-    console.error('Error generando CSV:', error);
+    console.error('Error generating CSV:', error);
     return false;
   }
 };
 
-export const exportDispatchHistoryToPDF = (history, filename = 'historial-despachos') => {
+export const exportDispatchHistoryToPDF = (history, filename = 'dispatch-history') => {
   try {
     const doc = new jsPDF();
     const pageWidth = doc.internal.pageSize.getWidth();
 
     // Título
     doc.setFontSize(18);
-    doc.text('📋 HISTORIAL DE DESPACHOS', pageWidth / 2, 15, { align: 'center' });
+    doc.text('📋 DISPATCH HISTORY', pageWidth / 2, 15, { align: 'center' });
 
     // Fecha
     doc.setFontSize(10);
-    doc.text(`Fecha: ${new Date().toLocaleDateString('es-ES')}`, pageWidth / 2, 22, { align: 'center' });
+    doc.text(`Date: ${new Date().toLocaleDateString('en-US')}`, pageWidth / 2, 22, { align: 'center' });
 
     // Tabla
     const tableData = history.map(item => [
@@ -126,12 +126,12 @@ export const exportDispatchHistoryToPDF = (history, filename = 'historial-despac
       item.sku,
       item.quantity,
       item.destination,
-      item.date?.toDate?.()?.toLocaleDateString('es-ES') || new Date(item.date).toLocaleDateString('es-ES'),
+      item.date?.toDate?.()?.toLocaleDateString('en-US') || new Date(item.date).toLocaleDateString('en-US'),
       item.dispatchedEmail?.split('@')[0] || 'Unknown'
     ]);
 
     doc.autoTable({
-      head: [['Producto', 'SKU', 'Cantidad', 'Destino', 'Fecha', 'Despachado por']],
+      head: [['Product', 'SKU', 'Quantity', 'Destination', 'Date', 'Dispatched by']],
       body: tableData,
       startY: 30,
       theme: 'grid',
@@ -156,22 +156,22 @@ export const exportDispatchHistoryToPDF = (history, filename = 'historial-despac
     doc.save(`${filename}-${new Date().toISOString().split('T')[0]}.pdf`);
     return true;
   } catch (error) {
-    console.error('Error generando PDF de historial:', error);
+    console.error('Error generating dispatch history PDF:', error);
     return false;
   }
 };
 
-export const exportDispatchHistoryToCSV = (history, filename = 'historial-despachos') => {
+export const exportDispatchHistoryToCSV = (history, filename = 'dispatch-history') => {
   try {
     const data = history.map(item => ({
-      'Producto': item.productName,
+      'Product': item.productName,
       'SKU': item.sku,
-      'Cantidad': item.quantity,
-      'Destino': item.destination,
-      'Fecha': item.date?.toDate?.()?.toLocaleDateString('es-ES') || new Date(item.date).toLocaleDateString('es-ES'),
-      'Hora': item.date?.toDate?.()?.toLocaleTimeString('es-ES') || new Date(item.date).toLocaleTimeString('es-ES'),
-      'Despachado por': item.dispatchedEmail || 'Unknown',
-      'Notas': item.notes || '-'
+      'Quantity': item.quantity,
+      'Destination': item.destination,
+      'Date': item.date?.toDate?.()?.toLocaleDateString('en-US') || new Date(item.date).toLocaleDateString('en-US'),
+      'Time': item.date?.toDate?.()?.toLocaleTimeString('en-US') || new Date(item.date).toLocaleTimeString('en-US'),
+      'Dispatched by': item.dispatchedEmail || 'Unknown',
+      'Notes': item.notes || '-'
     }));
 
     const csv = Papa.unparse(data, {
@@ -191,7 +191,7 @@ export const exportDispatchHistoryToCSV = (history, filename = 'historial-despac
     URL.revokeObjectURL(url);
     return true;
   } catch (error) {
-    console.error('Error generando CSV de historial:', error);
+    console.error('Error generating dispatch history CSV:', error);
     return false;
   }
 };

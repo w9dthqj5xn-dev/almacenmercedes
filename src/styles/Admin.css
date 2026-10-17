@@ -3,6 +3,8 @@
 .admin-page {
   min-height: 100vh;
   background: #f5f5f5;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .admin-container {
@@ -536,12 +538,16 @@
   padding: clamp(8px, 1.5vw, 12px) clamp(8px, 2vw, 12px);
   border-bottom: 2px solid #e0e0e0;
   overflow-x: auto;
+  overflow-y: hidden;
   -webkit-overflow-scrolling: touch;
   background: white;
   border-radius: 8px 8px 0 0;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
   width: 100%;
   box-sizing: border-box;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .tab-btn {
@@ -561,6 +567,9 @@
   position: relative;
   flex-shrink: 0;
   min-width: fit-content;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .tab-btn:hover {
@@ -804,6 +813,11 @@
     margin-bottom: 12px;
     gap: 4px;
     padding: 6px 4px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-behavior: smooth;
+    touch-action: manipulation;
+    -webkit-overflow-scrolling: touch;
   }
 
   .tab-btn {

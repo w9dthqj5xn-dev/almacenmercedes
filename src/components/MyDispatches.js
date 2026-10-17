@@ -137,40 +137,27 @@ const MyDispatches = () => {
     return <div className="my-dispatches">Loading your dispatch history...</div>;
   }
 
-  const stats = calculateStats();
-  const groupedDispatches = groupDispatchesByDate();
-
   return (
     <div className="my-dispatches">
       <div className="my-dispatches-header">
-        <div className="header-title">
-          <h3>📦 My Dispatch History</h3>
-          <p className="user-name">User: <strong>{user?.email?.split('@')[0]}</strong></p>
-        </div>
-        {myDispatches.length > 0 && (
-          <button className="btn-export" onClick={exportMyDispatches}>
-            <Download size={18} />
-            Export CSV
-          </button>
-        )}
-      </div>
-
-      <div className="my-stats">
-        <div className="stat-card">
-          <div className="stat-label">Total Dispatches</div>
-          <div className="stat-value">{stats.totalDispatches}</div>
-        </div>
-        <div className="stat-card highlight">
-          <div className="stat-label">Total Units</div>
-          <div className="stat-value">{stats.totalQuantity}</div>
-        </div>
-        <div className="stat-card success">
-          <div className="stat-label">Total Revenue</div>
-          <div className="stat-value">${stats.totalRevenue.toFixed(2)}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Active Days</div>
-          <div className="stat-value">{stats.totalDays}</div>
+        <h3>📦 My Dispatch History</h3>
+        <div className="my-dispatches-stats">
+          <div className="stat">
+            <span className="label">Total Dispatches</span>
+            <span className="value">{stats.totalDispatches}</span>
+          </div>
+          <div className="stat">
+            <span className="label">Total Units</span>
+            <span className="value">{stats.totalQuantity}</span>
+          </div>
+          <div className="stat">
+            <span className="label">Total Revenue</span>
+            <span className="value">${stats.totalRevenue.toFixed(2)}</span>
+          </div>
+          <div className="stat">
+            <span className="label">Active Days</span>
+            <span className="value">{stats.totalDays}</span>
+          </div>
         </div>
       </div>
 
@@ -181,59 +168,71 @@ const MyDispatches = () => {
             <p>Start creating dispatches from the form above</p>
           </div>
         ) : (
-          Object.keys(groupedDispatches).map(date => {
-            const dayDispatches = groupedDispatches[date];
-            const dayTotal = dayDispatches.reduce((sum, d) => sum + (parseFloat(d.cost) || 0), 0);
-            const isExpanded = expandedDates[date];
+          <>
+            {myDispatches.length > 0 && (
+              <button className="btn-export" onClick={exportMyDispatches}>
+                <Download size={18} />
+                Export CSV
+              </button>
+            )}
+            {Object.keys(groupedDispatches).map(date => {
+              const dayDispatches = groupedDispatches[date];
+              const dayTotal = dayDispatches.reduce((sum, d) => sum + (parseFloat(d.cost) || 0), 0);
+              const isExpanded = expandedDates[date];
 
-            return (
-              <div key={date} className="dispatch-day">
-                <div
-                  className="day-header"
-                  onClick={() => toggleExpandDate(date)}
-                >
-                  <div className="day-info">
-                    {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-                    <span className="date">{date}</span>
-                    <span className="day-count">({dayDispatches.length} dispatches)</span>
-                  </div>
-                  <div className="day-total">${dayTotal.toFixed(2)}</div>
+              return (
+                <div key={date} className="dispatch-day">
+                  <div
+                    className="day-header"
+                    onClick={() => toggleExpandDate(date)}
+                  >
+                    <div className="day-info">
+                      {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                      <span className="date">{date}</span>
+                    </div>
+                    <div className="day-summary">
+                      <span>
+                        <span className="count">{dayDispatches.length} dispatches</span>
+                        <span className="total">${dayTotal.toFixed(2)}</span>
+                      </span>
+                    </div>
                 </div>
 
-                {isExpanded && (
-                  <div className="day-details">
-                    <table className="dispatches-table">
-                      <thead>
-                        <tr>
-                          <th>Product</th>
-                          <th>Quantity</th>
-                          <th>Recipient</th>
-                          <th>Cost</th>
-                          <th>Time</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {dayDispatches.map(dispatch => (
-                          <tr key={dispatch.id}>
-                            <td className="product-name">
-                              <span className="sku">{dispatch.productSku}</span>
-                              {dispatch.productName}
-                            </td>
-                            <td className="quantity">{dispatch.quantity}</td>
-                            <td>{dispatch.recipientName || dispatch.destination || '-'}</td>
-                            <td className="cost">${parseFloat(dispatch.cost || 0).toFixed(2)}</td>
-                            <td className="time">
-                              {dispatch.time || new Date(dispatch.createdAt || dispatch.timestamp).toLocaleTimeString('en-US')}
-                            </td>
+                  {isExpanded && (
+                    <div className="day-details">
+                      <table className="dispatches-table">
+                        <thead>
+                          <tr>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Recipient</th>
+                            <th>Cost</th>
+                            <th>Time</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            );
-          })
+                        </thead>
+                        <tbody>
+                          {dayDispatches.map(dispatch => (
+                            <tr key={dispatch.id}>
+                              <td className="product-name">
+                                <span className="sku">{dispatch.productSku}</span>
+                                {dispatch.productName}
+                              </td>
+                              <td className="quantity">{dispatch.quantity}</td>
+                              <td>{dispatch.recipientName || dispatch.destination || '-'}</td>
+                              <td className="cost">${parseFloat(dispatch.cost || 0).toFixed(2)}</td>
+                              <td className="time">
+                                {dispatch.time || new Date(dispatch.createdAt || dispatch.timestamp).toLocaleTimeString('en-US')}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </>
         )}
       </div>
     </div>

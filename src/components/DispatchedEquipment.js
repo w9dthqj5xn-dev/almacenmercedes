@@ -10,6 +10,7 @@ const DispatchedEquipment = () => {
   const [users, setUsers] = useState([]);
   const [products, setProducts] = useState([]);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadData();
   }, []);

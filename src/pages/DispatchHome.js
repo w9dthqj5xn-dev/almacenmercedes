@@ -9,6 +9,8 @@ import '../styles/Dispatch.css';
 const DispatchHome = () => {
   const { user } = useAuth();
   const [inventory, setInventory] = useState([]);
+  // Dispatches se cargan pero solo para verificar estado, no se usa en el render
+  // eslint-disable-next-line no-unused-vars
   const [dispatches, setDispatches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -18,6 +20,7 @@ const DispatchHome = () => {
   const [dispatchError, setDispatchError] = useState('');
   const [dispatchSuccess, setDispatchSuccess] = useState('');
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadData();
   }, []);

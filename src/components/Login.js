@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 import '../styles/Auth.css';
 
 const Login = () => {
@@ -9,7 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [isRegisterMode, setIsRegisterMode] = useState(false);
+  const [isRegisterMode] = useState(false);
   const [registerRole, setRegisterRole] = useState('dispatch');
   const { login, register } = useAuth();
   const navigate = useNavigate();

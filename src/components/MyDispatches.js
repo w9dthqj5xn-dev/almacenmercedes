@@ -11,6 +11,7 @@ const MyDispatches = () => {
   const [loading, setLoading] = useState(true);
   const [expandedDates, setExpandedDates] = useState({});
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     loadMyDispatches();
   }, [user]);

@@ -100,14 +100,14 @@ const DispatchedEquipment = () => {
   return (
     <div className="dispatched-equipment">
       <div className="equipment-header">
-        <h3>📤 Equipos Despachados</h3>
+        <h3>📤 Dispatched Equipment</h3>
         <div className="equipment-stats">
           <div className="stat">
-            <span className="label">Total Despachos:</span>
+            <span className="label">Total Dispatches:</span>
             <span className="value">{filteredData.length}</span>
           </div>
           <div className="stat">
-            <span className="label">Total Cantidad:</span>
+            <span className="label">Total Quantity:</span>
             <span className="value">{totalQuantity}</span>
           </div>
         </div>
@@ -115,13 +115,13 @@ const DispatchedEquipment = () => {
 
       <div className="equipment-filters">
         <div className="filter-group">
-          <label>Filtrar por Usuario:</label>
+          <label>Filter by User:</label>
           <select 
             value={filterUser}
             onChange={(e) => setFilterUser(e.target.value)}
             className="filter-select"
           >
-            <option value="">Todos los usuarios</option>
+            <option value="">All users</option>
             {users.map(user => (
               <option key={user.uid} value={user.email}>
                 {user.email}
@@ -131,13 +131,13 @@ const DispatchedEquipment = () => {
         </div>
 
         <div className="filter-group">
-          <label>Filtrar por Producto:</label>
+          <label>Filter by Product:</label>
           <select 
             value={filterProduct}
             onChange={(e) => setFilterProduct(e.target.value)}
             className="filter-select"
           >
-            <option value="">Todos los productos</option>
+            <option value="">All products</option>
             {products.map(product => (
               <option key={product.id} value={product.id}>
                 {product.name}
@@ -153,27 +153,27 @@ const DispatchedEquipment = () => {
             setFilterProduct('');
           }}
         >
-          Limpiar Filtros
+          Clear Filters
         </button>
       </div>
 
       {filteredData.length === 0 ? (
         <div className="empty-state">
-          <p>No hay despachos registrados</p>
+          <p>No dispatches registered</p>
         </div>
       ) : (
         <div className="equipment-table">
           <table>
             <thead>
               <tr>
-                <th>ID Despacho</th>
-                <th>Fecha</th>
-                <th>Producto (SKU)</th>
-                <th>Cantidad</th>
-                <th>Destinatario</th>
-                <th>Costo</th>
-                <th>Usuario</th>
-                <th>Hora</th>
+                <th>Dispatch ID</th>
+                <th>Date</th>
+                <th>Product (SKU)</th>
+                <th>Quantity</th>
+                <th>Recipient</th>
+                <th>Cost</th>
+                <th>User</th>
+                <th>Time</th>
               </tr>
             </thead>
             <tbody>

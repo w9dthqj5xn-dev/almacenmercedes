@@ -76,25 +76,25 @@ const DispatchHome = () => {
 
   const handleDispatch = async (product) => {
     if (!dispatchQuantity || dispatchQuantity <= 0) {
-      setDispatchError('❌ Ingresa una cantidad válida (mayor a 0)');
+      setDispatchError('❌ Enter a valid quantity (greater than 0)');
       setTimeout(() => setDispatchError(''), 3000);
       return;
     }
 
     if (!recipientName.trim()) {
-      setDispatchError('❌ Ingresa el nombre de la empresa o persona');
+      setDispatchError('❌ Enter the company or person name');
       setTimeout(() => setDispatchError(''), 3000);
       return;
     }
 
     if (!dispatchCost || parseFloat(dispatchCost) < 0) {
-      setDispatchError('❌ Ingresa un costo válido');
+      setDispatchError('❌ Enter a valid cost');
       setTimeout(() => setDispatchError(''), 3000);
       return;
     }
 
     if (dispatchQuantity > product.quantity) {
-      setDispatchError(`❌ No hay suficiente stock. Disponible: ${product.quantity}`);
+      setDispatchError(`❌ Insufficient stock. Available: ${product.quantity}`);
       setTimeout(() => setDispatchError(''), 3000);
       return;
     }
@@ -130,7 +130,7 @@ const DispatchHome = () => {
         dispatched: (product.dispatched || 0) + parseInt(dispatchQuantity)
       });
 
-      setDispatchSuccess(`✅ Despacho registrado: ${dispatchQuantity} ${product.name} para ${recipientName}`);
+      setDispatchSuccess(`✅ Dispatch recorded: ${dispatchQuantity} ${product.name} for ${recipientName}`);
       setSelectedProduct(null);
       setDispatchQuantity(1);
       setRecipientName('');
@@ -141,7 +141,7 @@ const DispatchHome = () => {
       await loadData();
     } catch (error) {
       console.error('Error dispatching product:', error);
-      setDispatchError('❌ Error al registrar el despacho');
+      setDispatchError('❌ Error registering dispatch');
       setTimeout(() => setDispatchError(''), 3000);
     } finally {
       setLoading(false);
@@ -152,7 +152,7 @@ const DispatchHome = () => {
     return (
       <div className="dispatch-container">
         <div className="loader"></div>
-        <p>Cargando datos...</p>
+        <p>Loading data...</p>
       </div>
     );
   }
@@ -169,10 +169,10 @@ const DispatchHome = () => {
       <div className="dispatch-content">
         {/* Inventario disponible */}
         <section className="inventory-section">
-          <h2>📋 Inventario Disponible</h2>
+          <h2>📋 Available Inventory</h2>
           
           {inventory.length === 0 ? (
-            <p className="empty-state">No hay productos disponibles</p>
+            <p className="empty-state">No products available</p>
           ) : (
             <div className="inventory-grid">
               {inventory.map(product => (
@@ -186,13 +186,13 @@ const DispatchHome = () => {
                   
                   <div className="product-stats">
                     <div className="stat">
-                      <span className="label">Stock Disponible:</span>
+                      <span className="label">Available Stock:</span>
                       <span className={`value ${product.quantity > 0 ? 'available' : 'unavailable'}`}>
-                        {product.quantity} unidades
+                        {product.quantity} units
                       </span>
                     </div>
                     <div className="stat">
-                      <span className="label">Ya Despachados:</span>
+                      <span className="label">Already Dispatched:</span>
                       <span className="value">{product.dispatched || 0}</span>
                     </div>
                   </div>
@@ -203,7 +203,7 @@ const DispatchHome = () => {
                         type="text"
                         value={recipientName}
                         onChange={(e) => setRecipientName(e.target.value)}
-                        placeholder="Nombre de empresa o persona"
+                        placeholder="Company or person name"
                         className="text-input"
                       />
                       <input
@@ -212,7 +212,7 @@ const DispatchHome = () => {
                         max={product.quantity}
                         value={dispatchQuantity}
                         onChange={(e) => setDispatchQuantity(e.target.value)}
-                        placeholder="Cantidad"
+                        placeholder="Quantity"
                         className="quantity-input"
                       />
                       <input
@@ -221,7 +221,7 @@ const DispatchHome = () => {
                         step="0.01"
                         value={dispatchCost}
                         onChange={(e) => setDispatchCost(e.target.value)}
-                        placeholder="Costo ($)"
+                        placeholder="Cost ($)"
                         className="cost-input"
                       />
                       <div className="button-group">
@@ -230,7 +230,7 @@ const DispatchHome = () => {
                           onClick={() => handleDispatch(product)}
                           disabled={loading}
                         >
-                          {loading ? 'Procesando...' : 'Confirmar Despacho'}
+                          {loading ? 'Processing...' : 'Confirm Dispatch'}
                         </button>
                         <button
                           className="btn btn-secondary"
@@ -242,7 +242,7 @@ const DispatchHome = () => {
                           }}
                           disabled={loading}
                         >
-                          Cancelar
+                          Cancel
                         </button>
                       </div>
                     </div>
@@ -255,7 +255,7 @@ const DispatchHome = () => {
                       }}
                       disabled={product.stock === 0}
                     >
-                      📤 Hacer Despacho
+                      📤 Create Dispatch
                     </button>
                   )}
                 </div>
@@ -266,20 +266,20 @@ const DispatchHome = () => {
 
         {/* Historial de despachos */}
         <section className="dispatch-history-section">
-          <h2>📤 Historial de Despachos</h2>
+          <h2>📤 Dispatch History</h2>
           
           {dispatches.length === 0 ? (
-            <p className="empty-state">No hay despachos registrados</p>
+            <p className="empty-state">No dispatches registered</p>
           ) : (
             <div className="dispatches-table">
               <table>
                 <thead>
                   <tr>
-                    <th>Fecha</th>
-                    <th>Producto (SKU)</th>
-                    <th>Cantidad</th>
-                    <th>Usuario</th>
-                    <th>ID Despacho</th>
+                    <th>Date</th>
+                    <th>Product (SKU)</th>
+                    <th>Quantity</th>
+                    <th>User</th>
+                    <th>Dispatch ID</th>
                   </tr>
                 </thead>
                 <tbody>

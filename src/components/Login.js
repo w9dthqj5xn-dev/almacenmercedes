@@ -32,11 +32,11 @@ const Login = () => {
         navigate('/dispatch/home');
       } else {
         console.error('[Login] Unknown role:', role);
-        setError(`❌ Rol desconocido: ${role}`);
+        setError(`❌ Unknown role: ${role}`);
       }
     } catch (err) {
       console.error('[Login] Login error:', err);
-      const errorMsg = err.message || 'Error al iniciar sesión';
+      const errorMsg = err.message || 'Error logging in';
       setError(`❌ ${errorMsg}`);
     } finally {
       setLoading(false);
@@ -50,13 +50,13 @@ const Login = () => {
       setLoading(true);
       
       if (password.length < 6) {
-        setError('❌ La contraseña debe tener al menos 6 caracteres');
+        setError('❌ Password must be at least 6 characters');
         setLoading(false);
         return;
       }
 
       const { role } = await register(email, password, registerRole);
-      setError('✅ Cuenta creada exitosamente! Iniciando sesión...');
+      setError('✅ Account created successfully! Logging in...');
       
       // Auto login después de registrar con un pequeño delay
       setTimeout(async () => {
@@ -72,17 +72,17 @@ const Login = () => {
           } else if (role === 'dispatch') {
             navigate('/dispatch/home');
           } else {
-            setError(`❌ Rol desconocido: ${role}`);
+            setError(`❌ Unknown role: ${role}`);
           }
         } catch (loginErr) {
           console.error('[Login] Auto-login error:', loginErr);
-          const errorMsg = loginErr.message || 'Error al iniciar sesión automáticamente';
+          const errorMsg = loginErr.message || 'Error logging in automatically';
           setError(`❌ ${errorMsg}`);
           setLoading(false);
         }
       }, 500);
     } catch (err) {
-      const errorMsg = err.message || 'Error al registrarse';
+      const errorMsg = err.message || 'Registration error';
       setError(`❌ ${errorMsg}`);
       setLoading(false);
     }
@@ -94,7 +94,7 @@ const Login = () => {
         <div className="login-header">
           <img src="/mercedes-logo.jpeg" alt="Mercedes Group Logo" className="login-logo" />
           <h1>Mercedes Group</h1>
-          <p>Gestión de Almacén</p>
+          <p>Warehouse Management</p>
         </div>
 
         <form onSubmit={isRegisterMode ? handleRegister : handleLogin} className="login-form">
@@ -106,20 +106,20 @@ const Login = () => {
           )}
 
           <div className="form-group">
-            <label htmlFor="email">Correo Electrónico</label>
+            <label htmlFor="email">Email</label>
             <input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@almacen.com"
+              placeholder="admin@warehouse.com"
               required
               disabled={loading}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
+            <label htmlFor="password">Password</label>
             <input
               id="password"
               type="password"
@@ -133,15 +133,15 @@ const Login = () => {
 
           {isRegisterMode && (
             <div className="form-group">
-              <label htmlFor="role">Rol de Usuario</label>
+              <label htmlFor="role">User Role</label>
               <select 
                 id="role"
                 value={registerRole}
                 onChange={(e) => setRegisterRole(e.target.value)}
                 disabled={loading}
               >
-                <option value="dispatch">Despacho (Dispatch)</option>
-                <option value="admin">Administrador (Admin)</option>
+                <option value="dispatch">Dispatch</option>
+                <option value="admin">Administrator</option>
               </select>
             </div>
           )}
@@ -151,7 +151,7 @@ const Login = () => {
             className="login-btn"
             disabled={loading}
           >
-            {loading ? (isRegisterMode ? 'Registrando...' : 'Iniciando sesión...') : (isRegisterMode ? 'Crear Cuenta' : 'Iniciar Sesión')}
+            {loading ? (isRegisterMode ? 'Registering...' : 'Logging in...') : (isRegisterMode ? 'Create Account' : 'Log In')}
           </button>
 
         </form>

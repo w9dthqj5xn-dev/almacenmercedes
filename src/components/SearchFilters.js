@@ -11,7 +11,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
   });
   const [showFilters, setShowFilters] = useState(false);
 
-  // Aplicar búsqueda y filtros
+  // Apply search and filters
   const applyFilters = React.useCallback(() => {
     const filtered = inventory.filter(item => {
       const matchSearch = 
@@ -29,7 +29,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
     onFilter(filtered);
   }, [searchTerm, filters, inventory, onFilter]);
 
-  // Aplicar filtros cuando cambian
+  // Apply filters when they change
   React.useEffect(() => {
     applyFilters();
   }, [applyFilters]);
@@ -52,7 +52,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
         <Search size={20} className="search-icon" />
         <input
           type="text"
-          placeholder="Buscar por nombre, SKU o descripción..."
+          placeholder="Search by name, SKU or description..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="search-input"
@@ -61,7 +61,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
           <button
             className="clear-search"
             onClick={() => setSearchTerm('')}
-            title="Limpiar búsqueda"
+            title="Clear search"
           >
             <X size={18} />
           </button>
@@ -72,13 +72,13 @@ const SearchFilters = ({ inventory, onFilter }) => {
         className={`toggle-filters ${activeFilterCount > 0 ? 'active' : ''}`}
         onClick={() => setShowFilters(!showFilters)}
       >
-        🔧 Filtros {activeFilterCount > 0 && `(${activeFilterCount})`}
+        🔧 Filters {activeFilterCount > 0 && `(${activeFilterCount})`}
       </button>
 
       {showFilters && (
         <div className="filters-panel">
           <div className="filter-group">
-            <label>Stock Mínimo</label>
+            <label>Minimum Stock</label>
             <input
               type="range"
               min="0"
@@ -91,7 +91,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
           </div>
 
           <div className="filter-group">
-            <label>Stock Máximo</label>
+            <label>Maximum Stock</label>
             <input
               type="range"
               min="0"
@@ -107,7 +107,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
             className="btn-reset-filters"
             onClick={resetFilters}
           >
-            Limpiar Filtros
+            Clear Filters
           </button>
         </div>
       )}
@@ -115,7 +115,7 @@ const SearchFilters = ({ inventory, onFilter }) => {
       <div className="active-filters">
         {searchTerm && (
           <span className="filter-tag">
-            Búsqueda: <strong>{searchTerm}</strong>
+            Search: <strong>{searchTerm}</strong>
             <button onClick={() => setSearchTerm('')}><X size={14} /></button>
           </span>
         )}

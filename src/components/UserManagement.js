@@ -53,8 +53,8 @@ const UserManagement = () => {
         }
       }
     } catch (error) {
-      console.error('Error cargando usuarios:', error);
-      setMessage('❌ Error al cargar usuarios');
+      console.error('Error loading users:', error);
+      setMessage('❌ Error loading users');
     }
   };
 
@@ -70,12 +70,12 @@ const UserManagement = () => {
     e.preventDefault();
     
     if (!formData.email || !formData.password) {
-      setMessage('❌ Email y contraseña son requeridos');
+      setMessage('❌ Email and password are required');
       return;
     }
 
     if (formData.password.length < 6) {
-      setMessage('❌ La contraseña debe tener al menos 6 caracteres');
+      setMessage('❌ Password must be at least 6 characters long');
       return;
     }
 
@@ -101,7 +101,7 @@ const UserManagement = () => {
     e.preventDefault();
     
     if (!adminAuthForm.email || !adminAuthForm.password) {
-      setMessage('❌ Email y contraseña del admin son requeridos');
+      setMessage('❌ Admin email and password are required');
       return;
     }
 
@@ -122,7 +122,7 @@ const UserManagement = () => {
         const uid = `user-${Date.now()}`;
         
         if (mockUsers[userData.email]) {
-          setMessage('❌ El email ya está registrado');
+          setMessage('❌ Email is already registered');
           setLoading(false);
           return;
         }
@@ -139,7 +139,7 @@ const UserManagement = () => {
         localStorage.setItem('mock_users', JSON.stringify(mockUsers));
         await authModule.setMockUserData(uid, { role: userData.role });
         
-        setMessage('✅ Usuario creado exitosamente');
+        setMessage('✅ User created successfully');
         setFormData({ email: '', password: '', role: 'dispatch' });
         setShowForm(false);
         loadUsers();
@@ -160,11 +160,11 @@ const UserManagement = () => {
           } catch (createError) {
             console.error('[UserManagement] Error creating user:', createError.code, createError.message);
             if (createError.code === 'auth/email-already-in-use') {
-              setMessage('❌ El email ya está registrado');
+              setMessage('❌ Email is already registered');
             } else if (createError.code === 'auth/weak-password') {
-              setMessage('❌ La contraseña es muy débil');
+              setMessage('❌ Password is too weak');
             } else {
-              setMessage(`❌ Error al crear usuario: ${createError.message}`);
+              setMessage(`❌ Error creating user: ${createError.message}`);
             }
             throw createError;
           }
@@ -196,7 +196,7 @@ const UserManagement = () => {
             console.log('[UserManagement] User data saved to database successfully');
           } catch (dbError) {
             console.error('[UserManagement] Error saving user data:', dbError);
-            setMessage(`❌ Error al guardar datos del usuario: ${dbError.message}`);
+            setMessage(`❌ Error saving user data: ${dbError.message}`);
             throw dbError;
           }
 
@@ -224,7 +224,7 @@ const UserManagement = () => {
           await loadUsers();
 
           console.log('[UserManagement] User creation completed successfully');
-          setMessage('✅ Usuario creado exitosamente');
+          setMessage('✅ User created successfully');
           setFormData({ email: '', password: '', role: 'dispatch' });
           setShowForm(false);
           setShowAdminAuthModal(false);
@@ -239,15 +239,15 @@ const UserManagement = () => {
         }
       }
     } catch (error) {
-      console.error('Error creando usuario:', error);
-      setMessage(`❌ Error al crear usuario: ${error.message}`);
+      console.error('Error creating user:', error);
+      setMessage(`❌ Error creating user: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
   const handleDeleteUser = async (uid) => {
-    if (!window.confirm('¿Estás seguro de que quieres eliminar este usuario?')) {
+    if (!window.confirm('Are you sure you want to delete this user?')) {
       return;
     }
 
@@ -268,11 +268,11 @@ const UserManagement = () => {
         await set(userRef, null);
       }
 
-      setMessage('✅ Usuario eliminado exitosamente');
+      setMessage('✅ User deleted successfully');
       loadUsers();
     } catch (error) {
-      console.error('Error eliminando usuario:', error);
-      setMessage('❌ Error al eliminar usuario');
+      console.error('Error deleting user:', error);
+      setMessage('❌ Error deleting user');
     } finally {
       setLoading(false);
     }
@@ -283,8 +283,8 @@ const UserManagement = () => {
     return (
       <div className="user-management-error">
         <AlertCircle size={48} />
-        <h2>Acceso Denegado</h2>
-        <p>Solo los administradores pueden gestionar usuarios</p>
+        <h2>Access Denied</h2>
+        <p>Only administrators can manage users</p>
       </div>
     );
   }
@@ -295,8 +295,8 @@ const UserManagement = () => {
         <div className="header-title">
           <Users size={32} />
           <div>
-            <h2>Gestión de Usuarios</h2>
-            <p>Crea y administra usuarios del sistema</p>
+            <h2>User Management</h2>
+            <p>Create and manage system users</p>
           </div>
         </div>
         <button 
@@ -308,7 +308,7 @@ const UserManagement = () => {
           }}
         >
           <Plus size={20} />
-          Nuevo Usuario
+          New User
         </button>
       </div>
 
@@ -322,38 +322,38 @@ const UserManagement = () => {
       {showForm && (
         <div className="user-form-container">
           <form onSubmit={handleSubmit} className="user-form">
-            <h3>{editingId ? 'Editar Usuario' : 'Crear Nuevo Usuario'}</h3>
+            <h3>{editingId ? 'Edit User' : 'Create New User'}</h3>
 
             <div className="form-group">
-              <label htmlFor="email">Correo Electrónico</label>
+              <label htmlFor="email">Email</label>
               <input
                 id="email"
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                placeholder="usuario@example.com"
+                placeholder="user@example.com"
                 required
                 disabled={loading}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="password">Contraseña</label>
+              <label htmlFor="password">Password</label>
               <input
                 id="password"
                 type="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Minimum 6 characters"
                 required
                 disabled={loading}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="role">Rol</label>
+              <label htmlFor="role">Role</label>
               <select
                 id="role"
                 name="role"
@@ -361,8 +361,8 @@ const UserManagement = () => {
                 onChange={handleChange}
                 disabled={loading}
               >
-                <option value="dispatch">Despacho</option>
-                <option value="admin">Administrador</option>
+                <option value="dispatch">Dispatch</option>
+                <option value="admin">Administrator</option>
               </select>
             </div>
 
@@ -372,7 +372,7 @@ const UserManagement = () => {
                 className="btn-success"
                 disabled={loading}
               >
-                {loading ? 'Guardando...' : 'Crear Usuario'}
+                {loading ? 'Saving...' : 'Create User'}
               </button>
               <button 
                 type="button" 
@@ -383,7 +383,7 @@ const UserManagement = () => {
                 }}
                 disabled={loading}
               >
-                Cancelar
+                Cancel
               </button>
             </div>
           </form>
@@ -391,19 +391,19 @@ const UserManagement = () => {
       )}
 
       <div className="users-list">
-        <h3>Usuarios Registrados ({users.length})</h3>
+        <h3>Registered Users ({users.length})</h3>
         
         {users.length === 0 ? (
-          <p className="no-users">No hay usuarios registrados</p>
+          <p className="no-users">No users registered</p>
         ) : (
           <table className="users-table">
             <thead>
               <tr>
                 <th>Email</th>
-                <th>Rol</th>
-                <th>Estado</th>
-                <th>Creado</th>
-                <th>Acciones</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -412,17 +412,17 @@ const UserManagement = () => {
                   <td className="email-cell">{userData.email}</td>
                   <td className="role-cell">
                     <span className={`role-badge role-${userData.role}`}>
-                      {userData.role === 'admin' ? 'Administrador' : 'Despacho'}
+                      {userData.role === 'admin' ? 'Administrator' : 'Dispatch'}
                     </span>
                   </td>
                   <td className="status-cell">
                     <span className={`status-badge ${userData.active ? 'active' : 'inactive'}`}>
-                      {userData.active ? 'Activo' : 'Inactivo'}
+                      {userData.active ? 'Active' : 'Inactive'}
                     </span>
                   </td>
                   <td className="created-cell">
                     {userData.createdAt 
-                      ? new Date(userData.createdAt).toLocaleDateString('es-MX')
+                      ? new Date(userData.createdAt).toLocaleDateString('en-US')
                       : 'N/A'
                     }
                   </td>
@@ -431,7 +431,7 @@ const UserManagement = () => {
                       className="btn-delete"
                       onClick={() => handleDeleteUser(userData.uid)}
                       disabled={loading}
-                      title="Eliminar usuario"
+                      title="Delete user"
                     >
                       <Trash2 size={18} />
                     </button>

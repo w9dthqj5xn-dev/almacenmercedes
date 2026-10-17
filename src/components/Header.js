@@ -26,7 +26,7 @@ const Header = () => {
             <div>
               <p className="user-email">{user?.email}</p>
               <p className="user-role">
-                {userRole === 'admin' ? '👨‍💼 Administrador' : '📦 Despacho'}
+                {userRole === 'admin' ? '👨‍💼 Administrator' : '📦 Dispatch'}
               </p>
             </div>
           </div>
@@ -34,10 +34,10 @@ const Header = () => {
           <button 
             className="logout-btn"
             onClick={handleLogout}
-            title="Cerrar sesión"
+            title="Log out"
           >
             <LogOut size={20} />
-            <span>Salir</span>
+            <span>Logout</span>
           </button>
         </div>
       </div>

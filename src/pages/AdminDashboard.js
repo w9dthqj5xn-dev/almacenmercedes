@@ -77,7 +77,7 @@ const AdminDashboard = () => {
 
       // Validar campos requeridos
       if (!formData.name || !formData.quantity) {
-        alert('Por favor completa nombre y cantidad');
+        alert('Please complete product name and quantity');
         setLoading(false);
         return;
       }
@@ -95,17 +95,17 @@ const AdminDashboard = () => {
         created: editingId ? inventory.find(i => i.id === editingId)?.created : new Date().toISOString()
       };
 
-      console.log('💾 Guardando producto:', data);
+      console.log('💾 Saving product:', data);
 
       if (isLocalMode) {
         // Modo local: guardar en localStorage
         const mockInventory = JSON.parse(localStorage.getItem('mock_inventory') || '{}');
         if (editingId) {
           mockInventory[editingId] = { ...mockInventory[editingId], ...data };
-          console.log('✅ Producto actualizado en localStorage');
+          console.log('✅ Product updated in localStorage');
         } else {
           mockInventory[productId] = data;
-          console.log('✅ Nuevo producto guardado en localStorage:', productId);
+          console.log('✅ New product saved in localStorage:', productId);
         }
         localStorage.setItem('mock_inventory', JSON.stringify(mockInventory));
       } else {
@@ -114,15 +114,15 @@ const AdminDashboard = () => {
           if (editingId) {
             const productRef = dbRef(rtDatabase_obj, `products/${editingId}`);
             await update(productRef, data);
-            console.log('✅ Producto actualizado en Firebase');
+            console.log('✅ Product updated in Firebase');
           } else {
             const newProductRef = dbRef(rtDatabase_obj, `products/${productId}`);
             await set(newProductRef, data);
-            console.log('✅ Nuevo producto creado en Firebase:', productId);
+            console.log('✅ New product created in Firebase:', productId);
           }
         } catch (dbError) {
-          console.error('❌ Error en operación de BD:', dbError);
-          alert(`Error guardando en base de datos: ${dbError.message}`);
+          console.error('❌ Database error:', dbError);
+          alert(`Error saving to database: ${dbError.message}`);
           setLoading(false);
           return;
         }
@@ -137,9 +137,9 @@ const AdminDashboard = () => {
       await loadInventory();
       
       // Mostrar confirmación
-      alert(`✅ ¡Producto guardado exitosamente!`);
+      alert(`✅ Product saved successfully!`);
     } catch (error) {
-      console.error('❌ Error general guardando producto:', error);
+      console.error('❌ General error saving product:', error);
       alert(`Error: ${error.message}`);
     } finally {
       setLoading(false);
@@ -172,7 +172,7 @@ const AdminDashboard = () => {
         }
         loadInventory();
       } catch (error) {
-        console.error('Error eliminando producto:', error);
+        console.error('Error deleting product:', error);
       }
     }
   };
@@ -183,27 +183,27 @@ const AdminDashboard = () => {
       
       <div className="admin-container">
         <div className="admin-header">
-          <h2>📊 Dashboard Administrativo</h2>
+          <h2>📊 Admin Dashboard</h2>
           <div className="admin-tabs">
             <button
               className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
               onClick={() => setActiveTab('inventory')}
             >
-              📦 Inventario
+              📦 Inventory
             </button>
             <button
               className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
               onClick={() => setActiveTab('users')}
             >
               <Users size={18} />
-              Usuarios
+              Users
             </button>
             <button
               className={`tab-btn ${activeTab === 'dispatches' ? 'active' : ''}`}
               onClick={() => setActiveTab('dispatches')}
             >
               <Truck size={18} />
-              Equipos Despachados
+              Dispatched Equipment
             </button>
           </div>
         </div>
@@ -232,50 +232,50 @@ const AdminDashboard = () => {
                 }}
               >
                 <Plus size={20} />
-                Nuevo Producto
+                New Product
               </button>
             </div>
 
             {showForm && (
           <div className="form-section">
-            <h3>{editingId ? 'Editar Producto' : 'Registrar Nuevo Producto'}</h3>
+            <h3>{editingId ? 'Edit Product' : 'Add New Product'}</h3>
             <form onSubmit={handleSubmit} className="product-form">
               <div className="form-row">
                 <div className="form-group">
-                  <label>Nombre del Producto *</label>
+                  <label>Product Name *</label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
-                    placeholder="Ej: Cable USB"
+                    placeholder="E.g: USB Cable"
                     required
                   />
                 </div>
                 <div className="form-group">
-                  <label>SKU (Automático) *</label>
+                  <label>SKU (Auto-generated) *</label>
                   <input
                     type="text"
                     value={formData.sku}
                     readOnly
                     placeholder="SKU-001"
-                    title="El SKU se genera automáticamente"
+                    title="SKU is auto-generated"
                     required
                   />
                 </div>
               </div>
 
               <div className="form-group full">
-                <label>Descripción</label>
+                <label>Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({...formData, description: e.target.value})}
-                  placeholder="Descripción detallada del producto"
+                  placeholder="Detailed product description"
                   rows="4"
                 />
               </div>
 
               <div className="form-group">
-                <label>Cantidad en Stock *</label>
+                <label>Stock Quantity *</label>
                 <input
                   type="number"
                   value={formData.quantity}
@@ -288,7 +288,7 @@ const AdminDashboard = () => {
 
               <div className="form-actions">
                 <button type="submit" className="btn-primary" disabled={loading}>
-                  {loading ? 'Guardando...' : 'Guardar Producto'}
+                  {loading ? 'Saving...' : 'Save Product'}
                 </button>
                 <button 
                   type="button" 
@@ -299,7 +299,7 @@ const AdminDashboard = () => {
                     setFormData({ name: '', description: '', quantity: '', sku: '' });
                   }}
                 >
-                  Cancelar
+                  Cancel
                 </button>
               </div>
             </form>
@@ -310,20 +310,20 @@ const AdminDashboard = () => {
 
         <div className="inventory-section">
           <div className="inventory-header">
-            <h3>📋 Inventario ({filteredInventory.length})</h3>
+            <h3>📋 Inventory ({filteredInventory.length})</h3>
             <div className="inventory-actions">
               <button 
                 className="btn-export-pdf"
-                onClick={() => exportToPDF(filteredInventory, 'inventario')}
-                title="Descargar inventario como PDF"
+                onClick={() => exportToPDF(filteredInventory, 'inventory')}
+                title="Download inventory as PDF"
               >
                 <Download size={18} />
                 PDF
               </button>
               <button 
                 className="btn-export-csv"
-                onClick={() => exportToCSV(filteredInventory, 'inventario')}
-                title="Descargar inventario como CSV"
+                onClick={() => exportToCSV(filteredInventory, 'inventory')}
+                title="Download inventory as CSV"
               >
                 <Download size={18} />
                 CSV
@@ -333,7 +333,7 @@ const AdminDashboard = () => {
           
           {filteredInventory.length === 0 ? (
             <div className="empty-state">
-              <p>No hay productos registrados</p>
+              <p>No products registered</p>
             </div>
           ) : (
             <div className="inventory-grid">
@@ -345,7 +345,7 @@ const AdminDashboard = () => {
                     <p className="description">{item.description}</p>
                     <div className="stock-info">
                       <span className="quantity">Stock: <strong>{item.quantity}</strong></span>
-                      <span className="dispatched">Despachados: <strong>{item.dispatched || 0}</strong></span>
+                      <span className="dispatched">Dispatched: <strong>{item.dispatched || 0}</strong></span>
                     </div>
                   </div>
                   <div className="product-actions">

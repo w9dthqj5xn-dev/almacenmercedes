@@ -13,7 +13,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
     return (
       <div className="loading-container">
         <div className="loader"></div>
-        <p>Cargando...</p>
+        <p>Loading...</p>
       </div>
     );
   }
@@ -36,7 +36,7 @@ const AppRoutes = () => {
     return (
       <div className="loading-container">
         <div className="loader"></div>
-        <p>Inicializando aplicación...</p>
+        <p>Initializing application...</p>
       </div>
     );
   }

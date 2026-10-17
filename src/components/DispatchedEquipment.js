@@ -94,7 +94,7 @@ const DispatchedEquipment = () => {
   const totalQuantity = filteredData.reduce((sum, d) => sum + d.quantity, 0);
 
   if (loading) {
-    return <div className="loading">Cargando despachos...</div>;
+    return <div className="loading">Loading dispatches...</div>;
   }
 
   return (

@@ -210,7 +210,7 @@ const UserManagement = () => {
               console.error('[UserManagement] Error re-authenticating admin:', reAuthError.code, reAuthError.message);
               // El usuario fue creado exitosamente, pero el admin no pudo re-autenticarse
               // Mostrar mensaje de alerta pero no fallar completamente
-              setMessage('⚠️ Usuario creado exitosamente, pero hubo un error re-autenticando. Por favor inicia sesión nuevamente.');
+              setMessage('⚠️ User created successfully, but there was an error re-authenticating. Please log in again.');
             }
           } else {
             console.warn('[UserManagement] No admin credentials provided for re-authentication');
@@ -447,7 +447,7 @@ const UserManagement = () => {
         <div className="modal-overlay">
           <div className="modal-content admin-auth-modal">
             <div className="modal-header">
-              <h3>Verificación de Administrador</h3>
+              <h3>Administrator Verification</h3>
               <button 
                 className="modal-close"
                 onClick={() => {
@@ -461,11 +461,11 @@ const UserManagement = () => {
             </div>
 
             <div className="modal-body">
-              <p>Para crear un nuevo usuario, necesitamos verificar tu identidad como administrador.</p>
+              <p>To create a new user, we need to verify your identity as an administrator.</p>
               
               <form onSubmit={handleAdminAuthSubmit} className="admin-auth-form">
                 <div className="form-group">
-                  <label htmlFor="admin-email">Tu Email de Admin</label>
+                  <label htmlFor="admin-email">Your Admin Email</label>
                   <input
                     id="admin-email"
                     type="email"
@@ -481,7 +481,7 @@ const UserManagement = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="admin-password">Tu Contraseña de Admin</label>
+                  <label htmlFor="admin-password">Your Admin Password</label>
                   <input
                     id="admin-password"
                     type="password"
@@ -502,7 +502,7 @@ const UserManagement = () => {
                     className="btn-success"
                     disabled={loading}
                   >
-                    {loading ? 'Verificando...' : 'Verificar y Crear'}
+                    {loading ? 'Verifying...' : 'Verify and Create'}
                   </button>
                   <button 
                     type="button" 
@@ -514,7 +514,7 @@ const UserManagement = () => {
                     }}
                     disabled={loading}
                   >
-                    Cancelar
+                    Cancel
                   </button>
                 </div>
               </form>

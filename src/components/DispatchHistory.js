@@ -77,30 +77,30 @@ const DispatchHistory = ({ history, onDelete }) => {
   return (
     <div className="dispatch-history-container">
       <div className="history-header">
-        <h3>📋 Historial de Despachos ({sortedHistory.length})</h3>
-        <button className="btn-export" onClick={exportToCSV} title="Descargar como CSV">
+        <h3>📋 Dispatch History ({sortedHistory.length})</h3>
+        <button className="btn-export" onClick={exportToCSV} title="Download as CSV">
           <Download size={18} />
-          Exportar
+          Export
         </button>
       </div>
 
       <div className="history-controls">
         <select value={filter} onChange={(e) => setFilter(e.target.value)} className="filter-select">
-          <option value="all">Todos los despachos</option>
-          <option value="today">Hoy</option>
-          <option value="week">Última semana</option>
+          <option value="all">All dispatches</option>
+          <option value="today">Today</option>
+          <option value="week">Last week</option>
         </select>
 
         <select value={sortBy} onChange={(e) => setSortBy(e.target.value)} className="sort-select">
-          <option value="date">Ordenar por: Fecha</option>
-          <option value="product">Ordenar por: Producto</option>
-          <option value="quantity">Ordenar por: Cantidad</option>
+          <option value="date">Sort by: Date</option>
+          <option value="product">Sort by: Product</option>
+          <option value="quantity">Sort by: Quantity</option>
         </select>
       </div>
 
       {sortedHistory.length === 0 ? (
         <div className="empty-state">
-          <p>No hay despachos registrados en este período</p>
+          <p>No dispatches registered in this period</p>
         </div>
       ) : (
         <div className="history-list">

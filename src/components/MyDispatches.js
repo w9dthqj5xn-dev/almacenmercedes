@@ -137,6 +137,9 @@ const MyDispatches = () => {
     return <div className="my-dispatches">Loading your dispatch history...</div>;
   }
 
+  const stats = calculateStats();
+  const groupedDispatches = groupDispatchesByDate();
+
   return (
     <div className="my-dispatches">
       <div className="my-dispatches-header">

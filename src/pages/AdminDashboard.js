@@ -185,36 +185,38 @@ const AdminDashboard = () => {
       <div className="admin-container">
         <div className="admin-header">
           <h2>📊 Admin Dashboard</h2>
-          <div className="admin-tabs">
-            <button
-              className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
-              onClick={() => setActiveTab('inventory')}
-            >
-              📦 Inventory
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
-              onClick={() => setActiveTab('users')}
-            >
-              <Users size={18} />
-              Users
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'dispatches' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dispatches')}
-            >
-              <Truck size={18} />
-              Dispatched Equipment
-            </button>
-            <button
-              className={`tab-btn ${activeTab === 'reconciliation' ? 'active' : ''}`}
-              onClick={() => setActiveTab('reconciliation')}
-            >
-              <BarChart3 size={18} />
-              Cash Reconciliation
-            </button>
-          </div>
         </div>
+        
+        <div className="admin-tabs">
+          <button
+            className={`tab-btn ${activeTab === 'inventory' ? 'active' : ''}`}
+            onClick={() => setActiveTab('inventory')}
+          >
+            📦 Inventory
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`}
+            onClick={() => setActiveTab('users')}
+          >
+            <Users size={18} />
+            Users
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'dispatches' ? 'active' : ''}`}
+            onClick={() => setActiveTab('dispatches')}
+          >
+            <Truck size={18} />
+            Dispatched Equipment
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'reconciliation' ? 'active' : ''}`}
+            onClick={() => setActiveTab('reconciliation')}
+          >
+            <BarChart3 size={18} />
+            Cash Reconciliation
+          </button>
+        </div>
+        
         <React.Fragment>
         {activeTab === 'inventory' ? (
           <div className="tab-content">

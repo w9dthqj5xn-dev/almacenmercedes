@@ -11,8 +11,8 @@ const Statistics = ({ inventory }) => {
 
   // Datos para gráfico de pie (Stock vs Despachado)
   const stockData = [
-    { name: 'En Stock', value: totalStock },
-    { name: 'Despachado', value: totalDispatched }
+    { name: 'In Stock', value: totalStock },
+    { name: 'Dispatched', value: totalDispatched }
   ];
 
   // Datos para gráfico de barras (Top 5 productos)
@@ -22,7 +22,7 @@ const Statistics = ({ inventory }) => {
     .map(item => ({
       name: item.name.substring(0, 10),
       stock: item.quantity,
-      despachado: item.dispatched || 0
+      dispatched: item.dispatched || 0
     }));
 
   // Datos para gráfico de línea (Productos por rango de stock)
@@ -40,31 +40,31 @@ const Statistics = ({ inventory }) => {
     <div className="statistics-container">
       <div className="stats-overview">
         <div className="stat-card">
-          <h4>Total Productos</h4>
+          <h4>Total Products</h4>
           <p className="stat-value">{totalProducts}</p>
-          <p className="stat-subtitle">Ítems en inventario</p>
+          <p className="stat-subtitle">Items in inventory</p>
         </div>
         <div className="stat-card highlight">
-          <h4>Stock Total</h4>
+          <h4>Total Stock</h4>
           <p className="stat-value">{totalStock}</p>
-          <p className="stat-subtitle">Unidades disponibles</p>
+          <p className="stat-subtitle">Available units</p>
         </div>
         <div className="stat-card">
-          <h4>Despachado</h4>
+          <h4>Dispatched</h4>
           <p className="stat-value">{totalDispatched}</p>
-          <p className="stat-subtitle">Unidades enviadas</p>
+          <p className="stat-subtitle">Units shipped</p>
         </div>
         <div className="stat-card alert">
-          <h4>Bajo Stock</h4>
+          <h4>Low Stock</h4>
           <p className="stat-value">{lowStockProducts}</p>
-          <p className="stat-subtitle">Productos con &lt; 10 unidades</p>
+          <p className="stat-subtitle">Products with &lt; 10 units</p>
         </div>
       </div>
 
       <div className="charts-grid">
-        {/* Gráfico de Pie - Stock vs Despachado */}
+        {/* Stock vs Dispatched Pie Chart */}
         <div className="chart-container">
-          <h4>📊 Distribución: Stock vs Despachado</h4>
+          <h4>📊 Distribution: Stock vs Dispatched</h4>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
               <Pie
@@ -86,9 +86,9 @@ const Statistics = ({ inventory }) => {
           </ResponsiveContainer>
         </div>
 
-        {/* Gráfico de Barras - Top 5 Productos */}
+        {/* Bar Chart - Top 5 Products */}
         <div className="chart-container">
-          <h4>📈 Top 5 Productos por Stock</h4>
+          <h4>📈 Top 5 Products by Stock</h4>
           <ResponsiveContainer width="100%" height={250}>
             <BarChart data={topProducts}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -96,15 +96,15 @@ const Statistics = ({ inventory }) => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="stock" fill="#667eea" name="En Stock" />
-              <Bar dataKey="despachado" fill="#f093fb" name="Despachado" />
+              <Bar dataKey="stock" fill="#667eea" name="In Stock" />
+              <Bar dataKey="dispatched" fill="#f093fb" name="Dispatched" />
             </BarChart>
           </ResponsiveContainer>
         </div>
 
-        {/* Gráfico de Línea - Distribución por Rango */}
+        {/* Line Chart - Distribution by Range */}
         <div className="chart-container full-width">
-          <h4>📊 Distribución de Productos por Rango de Stock</h4>
+          <h4>📊 Product Distribution by Stock Range</h4>
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={stockRanges}>
               <CartesianGrid strokeDasharray="3 3" />
@@ -116,7 +116,7 @@ const Statistics = ({ inventory }) => {
                 type="monotone" 
                 dataKey="count" 
                 stroke="#667eea" 
-                name="Cantidad de Productos"
+                name="Number of Products"
                 strokeWidth={2}
                 dot={{ fill: '#667eea', r: 5 }}
               />

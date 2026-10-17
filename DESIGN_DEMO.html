@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyDispatches Component - Design Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      background: #f5f7fa;
+      color: #2c3e50;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* My Dispatches Styles */
+    .my-dispatches {
+      padding: 20px;
+    }
+
+    .my-dispatches-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    .my-dispatches-header h3 {
+      font-size: 24px;
+      color: #2c3e50;
+      margin: 0;
+      flex: 1;
+    }
+
+    .my-dispatches-stats {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .my-dispatches-stats .stat {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .my-dispatches-stats .label {
+      font-size: 12px;
+      color: #7f8c8d;
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .my-dispatches-stats .value {
+      font-size: 20px;
+      font-weight: bold;
+      color: #16a085;
+    }
+
+    .btn-export {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .btn-export:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #95a5a6;
+      font-size: 16px;
+    }
+
+    /* History List Section */
+    .my-dispatches-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* Day Section */
+    .dispatch-day {
+      border: 1px solid #ecf0f1;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 0.3s ease;
+    }
+
+    .dispatch-day:hover {
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .day-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+      cursor: pointer;
+      user-select: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .day-header:hover {
+      background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdc 100%);
+    }
+
+    .day-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .day-info svg {
+      color: #3498db;
+      flex-shrink: 0;
+    }
+
+    .day-info .date {
+      font-size: 16px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+
+    .day-summary {
+      display: flex;
+      gap: 25px;
+      align-items: center;
+    }
+
+    .day-summary span {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .day-summary .count {
+      font-size: 12px;
+      color: #7f8c8d;
+      font-weight: 500;
+    }
+
+    .day-summary .total {
+      font-size: 18px;
+      font-weight: 700;
+      color: #16a085;
+    }
+
+    /* Details Section */
+    .day-details {
+      padding: 0;
+      border-top: 1px solid #ecf0f1;
+      background: #fff;
+      overflow-x: auto;
+    }
+
+    .dispatches-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    .dispatches-table thead {
+      background: #f8f9fa;
+      border-bottom: 2px solid #ecf0f1;
+    }
+
+    .dispatches-table th {
+      padding: 12px 15px;
+      text-align: left;
+      font-weight: 600;
+      color: #2c3e50;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .dispatches-table tbody tr {
+      border-bottom: 1px solid #ecf0f1;
+      transition: background-color 0.2s ease;
+    }
+
+    .dispatches-table tbody tr:hover {
+      background-color: #f8f9fa;
+    }
+
+    .dispatches-table td {
+      padding: 12px 15px;
+      color: #2c3e50;
+    }
+
+    .dispatches-table .product-name {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .dispatches-table .sku {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: #3498db;
+      font-size: 13px;
+    }
+
+    .dispatches-table .quantity {
+      font-weight: 600;
+      color: #2c3e50;
+      text-align: center;
+    }
+
+    .dispatches-table .cost {
+      font-weight: 600;
+      color: #16a085;
+      text-align: right;
+    }
+
+    .dispatches-table .time {
+      font-size: 13px;
+      color: #7f8c8d;
+    }
+
+    .chevron {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      transition: transform 0.3s ease;
+    }
+
+    .expanded .chevron {
+      transform: rotate(180deg);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      .my-dispatches {
+        padding: 15px;
+      }
+
+      .my-dispatches-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .my-dispatches-stats {
+        justify-content: space-around;
+        width: 100%;
+      }
+
+      .day-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .day-info {
+        width: 100%;
+      }
+
+      .day-summary {
+        width: 100%;
+        justify-content: space-around;
+        gap: 15px;
+      }
+
+      .dispatches-table {
+        font-size: 12px;
+      }
+
+      .dispatches-table th,
+      .dispatches-table td {
+        padding: 8px 10px;
+      }
+
+      .btn-export {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .my-dispatches-stats {
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .dispatches-table th:nth-child(2),
+      .dispatches-table td:nth-child(2) {
+        display: none;
+      }
+
+      .dispatches-table th:nth-child(3),
+      .dispatches-table td:nth-child(3) {
+        display: none;
+      }
+    }
+
+    .demo-info {
+      background: #e8f4f8;
+      border-left: 4px solid #3498db;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      color: #2c3e50;
+    }
+
+    .demo-info strong {
+      color: #16a085;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="demo-info">
+      <strong>✨ MyDispatches Component Design Demo</strong><br>
+      This shows how the dispatch user's personal dispatch history looks with the same professional styling as the admin Cash Reconciliation dashboard.
+    </div>
+
+    <div class="my-dispatches">
+      <!-- Header with Title and Statistics -->
+      <div class="my-dispatches-header">
+        <h3>📦 My Dispatch History</h3>
+        <div class="my-dispatches-stats">
+          <div class="stat">
+            <span class="label">Total Dispatches</span>
+            <span class="value">12</span>
+          </div>
+          <div class="stat">
+            <span class="label">Total Units</span>
+            <span class="value">145</span>
+          </div>
+          <div class="stat">
+            <span class="label">Total Revenue</span>
+            <span class="value">$3,640.50</span>
+          </div>
+          <div class="stat">
+            <span class="label">Active Days</span>
+            <span class="value">8</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Button -->
+      <div class="my-dispatches-list">
+        <button class="btn-export">
+          📥 Export CSV
+        </button>
+
+        <!-- Day 1 -->
+        <div class="dispatch-day expanded">
+          <div class="day-header">
+            <div class="day-info">
+              <span class="chevron">▼</span>
+              <span class="date">October 16, 2026</span>
+            </div>
+            <div class="day-summary">
+              <span>
+                <span class="count">3 dispatches</span>
+                <span class="total">$850.00</span>
+              </span>
+            </div>
+          </div>
+          <div class="day-details">
+            <table class="dispatches-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Recipient</th>
+                  <th>Cost</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="product-name">
+                    <span class="sku">SKU-001-A</span>
+                    Electrical Equipment
+                  </td>
+                  <td class="quantity">50</td>
+                  <td>Acme Corporation</td>
+                  <td class="cost">$500.00</td>
+                  <td class="time">09:30 AM</td>
+                </tr>
+                <tr>
+                  <td class="product-name">
+                    <span class="sku">SKU-002-B</span>
+                    Construction Materials
+                  </td>
+                  <td class="quantity">25</td>
+                  <td>BuildCo Ltd</td>
+                  <td class="cost">$250.00</td>
+                  <td class="time">11:15 AM</td>
+                </tr>
+                <tr>
+                  <td class="product-name">
+                    <span class="sku">SKU-003-C</span>
+                    Cable & Wiring
+                  </td>
+                  <td class="quantity">30</td>
+                  <td>Tech Services Inc</td>
+                  <td class="cost">$100.00</td>
+                  <td class="time">02:45 PM</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Day 2 -->
+        <div class="dispatch-day">
+          <div class="day-header">
+            <div class="day-info">
+              <span class="chevron">▼</span>
+              <span class="date">October 15, 2026</span>
+            </div>
+            <div class="day-summary">
+              <span>
+                <span class="count">2 dispatches</span>
+                <span class="total">$450.50</span>
+              </span>
+            </div>
+          </div>
+          <div class="day-details" style="display: none;">
+            <table class="dispatches-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Quantity</th>
+                  <th>Recipient</th>
+                  <th>Cost</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="product-name">
+                    <span class="sku">SKU-001-A</span>
+                    Electrical Equipment
+                  </td>
+                  <td class="quantity">40</td>
+                  <td>Western Industries</td>
+                  <td class="cost">$400.00</td>
+                  <td class="time">10:00 AM</td>
+                </tr>
+                <tr>
+                  <td class="product-name">
+                    <span class="sku">SKU-004-D</span>
+                    Safety Equipment
+                  </td>
+                  <td class="quantity">10</td>
+                  <td>Logistics Plus</td>
+                  <td class="cost">$50.50</td>
+                  <td class="time">03:20 PM</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div style="margin-top: 40px; padding: 20px; background: white; border-radius: 8px; border-left: 4px solid #16a085;">
+      <h3 style="color: #16a085; margin-bottom: 15px;">✨ Key Design Features</h3>
+      <ul style="list-style: none; font-size: 14px; line-height: 1.8; color: #2c3e50;">
+        <li>✅ <strong>Professional Header</strong> - Title and statistics displayed horizontally at the top</li>
+        <li>✅ <strong>Color-Coded Stats</strong> - Green (#16a085) for amounts, blue (#3498db) for counts</li>
+        <li>✅ <strong>Expandable Sections</strong> - Click dates to expand/collapse dispatch details</li>
+        <li>✅ <strong>Responsive Design</strong> - Works on desktop, tablet, and mobile</li>
+        <li>✅ <strong>Consistent Styling</strong> - Matches admin dashboard Cash Reconciliation component</li>
+        <li>✅ <strong>Export Functionality</strong> - Download personal dispatch history as CSV</li>
+        <li>✅ <strong>User-Specific Data</strong> - Only shows this user's dispatches</li>
+        <li>✅ <strong>Real-Time Statistics</strong> - Automatically calculated from dispatch data</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    // Simple expand/collapse functionality for demo
+    document.querySelectorAll('.day-header').forEach(header => {
+      header.addEventListener('click', function() {
+        const dayElement = this.closest('.dispatch-day');
+        const details = dayElement.querySelector('.day-details');
+        
+        dayElement.classList.toggle('expanded');
+        if (details.style.display === 'none') {
+          details.style.display = '';
+        } else {
+          details.style.display = 'none';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

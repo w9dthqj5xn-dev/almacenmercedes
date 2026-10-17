@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { isLocalMode, rtDatabase_obj } from '../config/firebase';
 import { ref as dbRef, get, set, update, remove } from 'firebase/database';
-import { Plus, Trash2, Edit2, Download, Users, Truck } from 'lucide-react';
+import { Plus, Trash2, Edit2, Download, Users, Truck, BarChart3 } from 'lucide-react';
 import Header from '../components/Header';
 import SearchFilters from '../components/SearchFilters';
 import UserManagement from '../components/UserManagement';
 import DispatchedEquipment from '../components/DispatchedEquipment';
+import CashReconciliation from '../components/CashReconciliation';
 import { exportToPDF, exportToCSV } from '../utils/exportData';
 import '../styles/Admin.css';
 
@@ -205,6 +206,13 @@ const AdminDashboard = () => {
               <Truck size={18} />
               Dispatched Equipment
             </button>
+            <button
+              className={`tab-btn ${activeTab === 'reconciliation' ? 'active' : ''}`}
+              onClick={() => setActiveTab('reconciliation')}
+            >
+              <BarChart3 size={18} />
+              Cash Reconciliation
+            </button>
           </div>
         </div>
         <React.Fragment>
@@ -371,6 +379,10 @@ const AdminDashboard = () => {
         ) : activeTab === 'users' ? (
           <div className="tab-content">
             <UserManagement />
+          </div>
+        ) : activeTab === 'reconciliation' ? (
+          <div className="tab-content">
+            <CashReconciliation />
           </div>
         ) : (
           <div className="tab-content">

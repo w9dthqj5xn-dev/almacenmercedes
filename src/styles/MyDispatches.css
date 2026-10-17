@@ -1,0 +1,369 @@
+/* My Dispatches Styles */
+.my-dispatches {
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  margin-top: 20px;
+}
+
+.my-dispatches-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.header-title {
+  flex: 1;
+}
+
+.header-title h3 {
+  font-size: 22px;
+  color: #2c3e50;
+  margin: 0 0 8px 0;
+  font-weight: 700;
+}
+
+.header-title .user-name {
+  font-size: 14px;
+  color: #7f8c8d;
+  margin: 0;
+}
+
+.header-title .user-name strong {
+  color: #16a085;
+  font-weight: 600;
+}
+
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.btn-export:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-export:active {
+  transform: translateY(0);
+}
+
+/* Statistics Section */
+.my-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.stat-card {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #ecf0f1;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card.highlight {
+  border-left-color: #3498db;
+}
+
+.stat-card.success {
+  border-left-color: #16a085;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #7f8c8d;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.stat-card.highlight .stat-value {
+  color: #3498db;
+}
+
+.stat-card.success .stat-value {
+  color: #16a085;
+}
+
+/* Dispatches List */
+.my-dispatches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 8px;
+  color: #95a5a6;
+}
+
+.empty-state p {
+  margin: 8px 0;
+  font-size: 16px;
+}
+
+.empty-state p:first-child {
+  font-weight: 500;
+  color: #7f8c8d;
+  margin-bottom: 4px;
+}
+
+/* Day Section */
+.dispatch-day {
+  background: white;
+  border: 1px solid #ecf0f1;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.dispatch-day:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ecf0f1 100%);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color 0.3s ease;
+}
+
+.day-header:hover {
+  background: linear-gradient(135deg, #ecf0f1 0%, #d5dbdc 100%);
+}
+
+.day-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.day-info svg {
+  color: #3498db;
+  flex-shrink: 0;
+}
+
+.day-info .date {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.day-info .day-count {
+  font-size: 13px;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.day-total {
+  font-size: 18px;
+  font-weight: 700;
+  color: #16a085;
+  min-width: 100px;
+  text-align: right;
+}
+
+/* Details Section */
+.day-details {
+  border-top: 1px solid #ecf0f1;
+  padding: 0;
+  background: white;
+  overflow-x: auto;
+}
+
+.dispatches-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.dispatches-table thead {
+  background: #f8f9fa;
+  border-bottom: 2px solid #ecf0f1;
+}
+
+.dispatches-table th {
+  padding: 12px 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #2c3e50;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.dispatches-table tbody tr {
+  border-bottom: 1px solid #ecf0f1;
+  transition: background-color 0.2s ease;
+}
+
+.dispatches-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.dispatches-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.dispatches-table td {
+  padding: 12px 15px;
+  color: #2c3e50;
+}
+
+.dispatches-table .product-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dispatches-table .sku {
+  font-size: 12px;
+  color: #95a5a6;
+  font-family: 'Courier New', monospace;
+  font-weight: 500;
+}
+
+.dispatches-table .quantity {
+  font-weight: 600;
+  text-align: center;
+  color: #2c3e50;
+  min-width: 70px;
+}
+
+.dispatches-table .cost {
+  font-weight: 700;
+  color: #16a085;
+  text-align: right;
+  min-width: 80px;
+}
+
+.dispatches-table .time {
+  font-size: 13px;
+  color: #7f8c8d;
+  text-align: right;
+  min-width: 100px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .my-dispatches {
+    padding: 15px;
+  }
+
+  .my-dispatches-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .btn-export {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .my-stats {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 16px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .day-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .day-info {
+    width: 100%;
+  }
+
+  .day-total {
+    width: 100%;
+    text-align: left;
+  }
+
+  .dispatches-table {
+    font-size: 12px;
+  }
+
+  .dispatches-table th,
+  .dispatches-table td {
+    padding: 8px 10px;
+  }
+
+  .dispatches-table .product-name {
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .dispatches-table .sku {
+    min-width: 60px;
+  }
+}
+
+@media (max-width: 480px) {
+  .my-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .dispatches-table th:nth-child(2),
+  .dispatches-table td:nth-child(2) {
+    display: none;
+  }
+
+  .dispatches-table th:nth-child(3),
+  .dispatches-table td:nth-child(3) {
+    display: none;
+  }
+}

@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { ref as dbRef, get, set as dbSet, update as dbUpdate } from 'firebase/database';
 import { rtDatabase_obj } from '../config/firebase';
 import Header from '../components/Header';
+import MyDispatches from '../components/MyDispatches';
 import '../styles/Dispatch.css';
 
 const DispatchHome = () => {
@@ -264,43 +265,8 @@ const DispatchHome = () => {
           )}
         </section>
 
-        {/* Historial de despachos */}
-        <section className="dispatch-history-section">
-          <h2>📤 Dispatch History</h2>
-          
-          {dispatches.length === 0 ? (
-            <p className="empty-state">No dispatches registered</p>
-          ) : (
-            <div className="dispatches-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Date</th>
-                    <th>Product (SKU)</th>
-                    <th>Quantity</th>
-                    <th>User</th>
-                    <th>Dispatch ID</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {dispatches.map(dispatch => (
-                    <tr key={dispatch.id}>
-                      <td>{dispatch.date}</td>
-                      <td>
-                        {dispatch.productName}
-                        <br />
-                        <small>{dispatch.productSku}</small>
-                      </td>
-                      <td className="quantity-cell">{dispatch.quantity}</td>
-                      <td>{dispatch.userEmail}</td>
-                      <td className="id-cell">{dispatch.id}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </section>
+        {/* My Dispatch History Component */}
+        <MyDispatches key={user?.email} />
       </div>
     </div>
   );
